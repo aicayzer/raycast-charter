@@ -17,8 +17,11 @@ export interface ChartActionsProps {
   chart: ChartType;
   isFavourite: boolean;
   onToggleFavourite: (id: string) => Promise<boolean>;
+  /** Called when the type is opened or copied from, so it joins the Recent section. */
+  onUse: (id: string) => Promise<void>;
   /** Present in the browse views, absent on the chart page itself. */
   browse?: {
+    onClearRecent?: () => Promise<void>;
     viewMode: ViewMode;
     onSwitchView: () => void;
     showDetail: boolean;
@@ -28,12 +31,26 @@ export interface ChartActionsProps {
   };
 }
 
-export default function ChartActions({ chart, isFavourite, onToggleFavourite, browse }: ChartActionsProps) {
+export default function ChartActions({ chart, isFavourite, onToggleFavourite, onUse, browse }: ChartActionsProps) {
   const docs = docsUrl(chart);
   const addCommand = shadcnAddCommand(chart);
   const fenced = fencedTemplate(chart);
   // With the list panel open the page would repeat what is already on screen, so Enter goes to the docs.
   const docsFirst = !browse || (browse.viewMode === "list" && browse.showDetail);
+
+  // Recording a use is bookkeeping; a storage failure must not stop the copy or open it follows.
+  function used() {
+    onUse(chart.id).catch((error) => showFailureToast(error, { title: "Could not update recent" }));
+  }
+
+  async function clearRecent() {
+    try {
+      await browse?.onClearRecent?.();
+      await showToast({ style: Toast.Style.Success, title: "Cleared Recent" });
+    } catch (error) {
+      await showFailureToast(error, { title: "Could not clear recent" });
+    }
+  }
 
   async function toggleFavourite() {
     try {
@@ -50,48 +67,79 @@ export default function ChartActions({ chart, isFavourite, onToggleFavourite, br
   return (
     <ActionPanel title={chart.name}>
       <ActionPanel.Section>
-        {docsFirst && docs && <Action.OpenInBrowser title="Open Docs" url={docs} />}
+        {docsFirst && docs && <Action.OpenInBrowser title="Open Docs" url={docs} onOpen={used} />}
         {browse && (
           <Action.Push
             title="Show Chart"
             icon={Icon.Eye}
-            target={<ChartDetail chart={chart} isFavourite={isFavourite} onToggleFavourite={onToggleFavourite} />}
+            target={
+              <ChartDetail
+                chart={chart}
+                isFavourite={isFavourite}
+                onToggleFavourite={onToggleFavourite}
+                onUse={onUse}
+              />
+            }
+            onPush={used}
           />
         )}
-        {!docsFirst && docs && <Action.OpenInBrowser title="Open Docs" url={docs} />}
+        {!docsFirst && docs && <Action.OpenInBrowser title="Open Docs" url={docs} onOpen={used} />}
       </ActionPanel.Section>
 
       <ActionPanel.Section title="Copy">
         {docs && (
-          <Action.CopyToClipboard title="Copy Docs Link" content={docs} shortcut={Keyboard.Shortcut.Common.Copy} />
+          <Action.CopyToClipboard
+            title="Copy Docs Link"
+            content={docs}
+            shortcut={Keyboard.Shortcut.Common.Copy}
+            onCopy={used}
+          />
         )}
-        {fenced && <Action.CopyToClipboard title="Copy Template" content={fenced} shortcut={shortcut("t", "shift")} />}
+        {fenced && (
+          <Action.CopyToClipboard
+            title="Copy Template"
+            content={fenced}
+            shortcut={shortcut("t", "shift")}
+            onCopy={used}
+          />
+        )}
         {chart.mermaid && (
           <Action.CopyToClipboard
             title="Copy Raw Template"
             content={chart.mermaid.template}
             shortcut={shortcut("r", "shift")}
+            onCopy={used}
           />
         )}
         <Action.CopyToClipboard
           title="Copy Prompt Snippet"
           content={promptSnippet(chart)}
           shortcut={shortcut("p", "shift")}
+          onCopy={used}
         />
         {addCommand && (
-          <Action.CopyToClipboard title="Copy Install Command" content={addCommand} shortcut={shortcut("i", "shift")} />
+          <Action.CopyToClipboard
+            title="Copy Install Command"
+            content={addCommand}
+            shortcut={shortcut("i", "shift")}
+            onCopy={used}
+          />
         )}
       </ActionPanel.Section>
 
       <ActionPanel.Section title="Providers">
         {chart.mermaid && (
-          <Action.OpenInBrowser title={`Open ${PROVIDERS.mermaid.title} Docs`} url={chart.mermaid.docs} />
+          <Action.OpenInBrowser title={`Open ${PROVIDERS.mermaid.title} Docs`} url={chart.mermaid.docs} onOpen={used} />
         )}
         {chart.shadcn && (
-          <Action.OpenInBrowser title={`Open ${PROVIDERS.shadcn.title} Example`} url={chart.shadcn.docs} />
+          <Action.OpenInBrowser
+            title={`Open ${PROVIDERS.shadcn.title} Example`}
+            url={chart.shadcn.docs}
+            onOpen={used}
+          />
         )}
         {chart.echarts && (
-          <Action.OpenInBrowser title={`Open ${PROVIDERS.echarts.title} Docs`} url={chart.echarts.docs} />
+          <Action.OpenInBrowser title={`Open ${PROVIDERS.echarts.title} Docs`} url={chart.echarts.docs} onOpen={used} />
         )}
       </ActionPanel.Section>
 
@@ -132,6 +180,14 @@ export default function ChartActions({ chart, isFavourite, onToggleFavourite, br
             icon={Icon.Minimize}
             shortcut={shortcut("-")}
             onAction={() => browse.onColumnsChange(browse.columns + 1)}
+          />
+        )}
+        {browse?.onClearRecent && (
+          <Action
+            title="Clear Recent"
+            icon={Icon.XMarkCircle}
+            style={Action.Style.Destructive}
+            onAction={clearRecent}
           />
         )}
       </ActionPanel.Section>

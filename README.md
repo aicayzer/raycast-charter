@@ -4,7 +4,7 @@ A catalogue of chart and diagram types for Raycast. Browse by family, see which 
 
 ## Commands
 
-- **Browse Charts** lists every type, grouped by family, with your favourites first. The dropdown in the search bar narrows the catalogue to one provider (All, Mermaid, shadcn or ECharts) and remembers the choice. `cmd+shift+l` switches between a grid of thumbnails and a list with a detail panel; `cmd+=` and `cmd+-` change the tile size. Search matches names and synonyms, so "spider" finds Radar and "flow of money" finds Sankey.
+- **Browse Charts** lists every type, grouped by family, with your favourites and the five types you last opened or copied from at the top. The dropdown in the search bar narrows the catalogue to one provider (All, Mermaid, shadcn or ECharts) and remembers the choice. `cmd+shift+l` switches between a grid of thumbnails and a list with a detail panel; `cmd+=` and `cmd+-` change the tile size. Search matches names and synonyms, so "spider" finds Radar and "flow of money" finds Sankey.
 
 ## What each type shows
 
@@ -17,4 +17,4 @@ A catalogue of chart and diagram types for Raycast. Browse by family, see which 
 - **Open Docs** opens the Mermaid page, or the first provider's page when the type has no Mermaid syntax. It is the Enter action on the chart page and in the list when the detail panel is open; elsewhere Enter opens the chart page.
 - **Copy Docs Link**, **Copy Template** and **Copy Prompt Snippet** put the link, a complete example, or a ready-to-paste instruction for a model on the clipboard. The template comes inside a ```mermaid fence so it drops straight into a chat or a Markdown note; **Copy Raw Template** gives the bare syntax.
 - **Copy Install Command** copies `npx shadcn@latest add <block>` when a recipe exists.
-- **Add to Favourites** pins a type to the top of the catalogue.
+- **Add to Favourites** pins a type to the top of the catalogue, and **Clear Recent** empties the Recent section.

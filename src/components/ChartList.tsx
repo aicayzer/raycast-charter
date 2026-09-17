@@ -40,6 +40,8 @@ export default function ChartList(props: BrowseProps) {
     isLoading,
     isFavourite,
     onToggleFavourite,
+    onUse,
+    onClearRecent,
     filter,
     onFilterChange,
     viewMode,
@@ -72,7 +74,9 @@ export default function ChartList(props: BrowseProps) {
                   chart={chart}
                   isFavourite={isFavourite(chart.id)}
                   onToggleFavourite={onToggleFavourite}
+                  onUse={onUse}
                   browse={{
+                    onClearRecent,
                     viewMode,
                     onSwitchView: () => onViewModeChange("grid"),
                     showDetail,

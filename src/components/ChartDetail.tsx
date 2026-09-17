@@ -9,6 +9,7 @@ interface ChartDetailProps {
   chart: ChartType;
   isFavourite: boolean;
   onToggleFavourite: (id: string) => Promise<boolean>;
+  onUse: (id: string) => Promise<void>;
 }
 
 export function chartMarkdown(chart: ChartType): string {
@@ -22,13 +23,15 @@ export function chartMarkdown(chart: ChartType): string {
   return parts.filter(Boolean).join("\n\n");
 }
 
-export default function ChartDetail({ chart, isFavourite, onToggleFavourite }: ChartDetailProps) {
+export default function ChartDetail({ chart, isFavourite, onToggleFavourite, onUse }: ChartDetailProps) {
   return (
     <Detail
       navigationTitle={chart.name}
       markdown={chartMarkdown(chart)}
       metadata={<ChartMetadata chart={chart} />}
-      actions={<ChartActions chart={chart} isFavourite={isFavourite} onToggleFavourite={onToggleFavourite} />}
+      actions={
+        <ChartActions chart={chart} isFavourite={isFavourite} onToggleFavourite={onToggleFavourite} onUse={onUse} />
+      }
     />
   );
 }

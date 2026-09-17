@@ -11,6 +11,10 @@ export interface BrowseProps {
   isLoading: boolean;
   isFavourite: (id: string) => boolean;
   onToggleFavourite: (id: string) => Promise<boolean>;
+  /** Called when a type is opened or copied from, so it joins the Recent section. */
+  onUse: (id: string) => Promise<void>;
+  /** Absent when there is nothing to clear. */
+  onClearRecent?: () => Promise<void>;
   filter: ProviderFilter;
   onFilterChange: (filter: ProviderFilter) => void;
   viewMode: ViewMode;
@@ -27,6 +31,8 @@ export default function ChartGrid(props: BrowseProps) {
     isLoading,
     isFavourite,
     onToggleFavourite,
+    onUse,
+    onClearRecent,
     filter,
     onFilterChange,
     viewMode,
@@ -60,7 +66,9 @@ export default function ChartGrid(props: BrowseProps) {
                   chart={chart}
                   isFavourite={isFavourite(chart.id)}
                   onToggleFavourite={onToggleFavourite}
+                  onUse={onUse}
                   browse={{
+                    onClearRecent,
                     viewMode,
                     onSwitchView: () => onViewModeChange("list"),
                     showDetail,
