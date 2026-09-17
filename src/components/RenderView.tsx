@@ -13,7 +13,7 @@ import { showFailureToast, usePromise } from "@raycast/utils";
 import { copyFileSync, readFileSync } from "node:fs";
 import { homedir } from "node:os";
 import { join } from "node:path";
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { renderChart, renderChartWithKroki } from "../lib/render";
 import { BROWSER_NAMES } from "../lib/render/browser";
 import { sourceLabel, type ChartSource } from "../lib/render/source";
@@ -36,13 +36,27 @@ function timestamp(): string {
   return new Date().toISOString().replace(/[:T]/g, "-").slice(0, 19);
 }
 
+/** usePromise drops the result of an aborted call when the error carries this name. */
+function abortError(): Error {
+  const error = new Error("Render abandoned");
+  error.name = "AbortError";
+  return error;
+}
+
 export default function RenderView({ source, title = "Render Chart" }: RenderViewProps) {
   const [route, setRoute] = useState<Route>("browser");
+  const abortable = useRef<AbortController>(undefined);
   const { data, error, isLoading, revalidate } = usePromise(
-    (source: ChartSource, route: Route) => (route === "kroki" ? renderChartWithKroki(source) : renderChart(source)),
+    async (source: ChartSource, route: Route) => {
+      // Development mounts twice and abandons the first call at once; skipping it saves a browser launch.
+      const signal = abortable.current?.signal;
+      await new Promise((settle) => setTimeout(settle, 0));
+      if (signal?.aborted) throw abortError();
+      return route === "kroki" ? renderChartWithKroki(source) : renderChart(source);
+    },
     [source, route],
     // The failure is the content of the view, so the default toast would say it twice.
-    { onError: () => undefined },
+    { abortable, onError: () => undefined },
   );
   const label = sourceLabel(source);
 
