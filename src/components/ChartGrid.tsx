@@ -47,7 +47,7 @@ export default function ChartGrid(props: BrowseProps) {
       searchBarAccessory={<ViewDropdown value={viewMode} onChange={onViewModeChange} />}
     >
       {sections.map((section) => (
-        <Grid.Section key={section.id} title={section.title} subtitle={String(section.charts.length)}>
+        <Grid.Section key={section.id} title={section.title}>
           {section.charts.map((chart) => (
             <Grid.Item
               key={`${section.id}-${chart.id}`}

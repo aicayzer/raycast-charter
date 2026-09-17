@@ -31,6 +31,8 @@ export interface ChartActionsProps {
 export default function ChartActions({ chart, isFavourite, onToggleFavourite, browse }: ChartActionsProps) {
   const docs = docsUrl(chart);
   const addCommand = shadcnAddCommand(chart);
+  // With the list panel open the page would repeat what is already on screen, so Enter goes to the docs.
+  const docsFirst = !browse || (browse.viewMode === "list" && browse.showDetail);
 
   async function toggleFavourite() {
     try {
@@ -47,6 +49,7 @@ export default function ChartActions({ chart, isFavourite, onToggleFavourite, br
   return (
     <ActionPanel title={chart.name}>
       <ActionPanel.Section>
+        {docsFirst && docs && <Action.OpenInBrowser title="Open Docs" url={docs} />}
         {browse && (
           <Action.Push
             title="Show Chart"
@@ -54,7 +57,7 @@ export default function ChartActions({ chart, isFavourite, onToggleFavourite, br
             target={<ChartDetail chart={chart} isFavourite={isFavourite} onToggleFavourite={onToggleFavourite} />}
           />
         )}
-        {docs && <Action.OpenInBrowser title="Open Docs" url={docs} />}
+        {!docsFirst && docs && <Action.OpenInBrowser title="Open Docs" url={docs} />}
       </ActionPanel.Section>
 
       <ActionPanel.Section title="Copy">

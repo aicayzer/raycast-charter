@@ -1,39 +1,31 @@
 import { Color, Detail } from "@raycast/api";
 import { familyInfo } from "../data/families";
 import { PROVIDERS } from "../data/providers";
-import type { ChartType } from "../lib/catalogue";
-
-const NOT_AVAILABLE = "Not available";
+import { mermaidLabel, missingProviders, type ChartType } from "../lib/catalogue";
 
 /**
- * The structured half of a chart: family, one row per provider, synonyms.
- * Each provider row is a link to its docs with the keyword as the text, so
- * the panel stays five rows tall. Detail.Metadata and List.Item.Detail.Metadata
- * are the same component, so one tree serves the chart page and the list panel.
+ * The structured half of a chart: family, one link row per provider that can
+ * draw it (keyword as the text, first Mermaid release folded in), one row
+ * naming the providers that cannot, then synonyms. Detail.Metadata and
+ * List.Item.Detail.Metadata are the same component, so one tree serves both.
  */
 export default function ChartMetadata({ chart }: { chart: ChartType }) {
   const { mermaid, shadcn, echarts } = chart;
-  const mermaidText = mermaid
-    ? [mermaid.keyword, mermaid.since && `since ${mermaid.since}`, mermaid.beta && "beta"].filter(Boolean).join(", ")
-    : undefined;
+  const missing = missingProviders(chart);
 
   return (
     <Detail.Metadata>
       <Detail.Metadata.Label title="Family" text={familyInfo(chart.family).title} />
-      {mermaid && mermaidText ? (
-        <Detail.Metadata.Link title={PROVIDERS.mermaid.title} target={mermaid.docs} text={mermaidText} />
-      ) : (
-        <Detail.Metadata.Label title={PROVIDERS.mermaid.title} text={NOT_AVAILABLE} />
+      {mermaid && (
+        <Detail.Metadata.Link title={PROVIDERS.mermaid.title} target={mermaid.docs} text={mermaidLabel(chart) ?? ""} />
       )}
-      {shadcn ? (
-        <Detail.Metadata.Link title={PROVIDERS.shadcn.title} target={shadcn.docs} text={shadcn.block} />
-      ) : (
-        <Detail.Metadata.Label title={PROVIDERS.shadcn.title} text={NOT_AVAILABLE} />
-      )}
-      {echarts ? (
-        <Detail.Metadata.Link title={PROVIDERS.echarts.title} target={echarts.docs} text={echarts.series} />
-      ) : (
-        <Detail.Metadata.Label title={PROVIDERS.echarts.title} text={NOT_AVAILABLE} />
+      {shadcn && <Detail.Metadata.Link title={PROVIDERS.shadcn.title} target={shadcn.docs} text={shadcn.block} />}
+      {echarts && <Detail.Metadata.Link title={PROVIDERS.echarts.title} target={echarts.docs} text={echarts.series} />}
+      {missing.length > 0 && (
+        <Detail.Metadata.Label
+          title="Not available"
+          text={missing.map((provider) => PROVIDERS[provider].title).join(", ")}
+        />
       )}
       <Detail.Metadata.Separator />
       <Detail.Metadata.TagList title="Also known as">

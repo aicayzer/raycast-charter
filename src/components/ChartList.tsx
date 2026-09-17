@@ -1,5 +1,4 @@
 import { Color, List } from "@raycast/api";
-import { familyInfo } from "../data/families";
 import { PROVIDERS } from "../data/providers";
 import { mermaidTag, searchKeywords, type ChartType } from "../lib/catalogue";
 import { thumbnailMarkdown } from "../lib/thumbnails";
@@ -28,8 +27,11 @@ function accessories(chart: ChartType, compact: boolean): List.Item.Accessory[] 
   return items;
 }
 
+/** The panel is short, so the thumbnail is fixed at a size that leaves room for the metadata. */
+const PANEL_THUMBNAIL = { width: 240, height: 160 };
+
 function panelMarkdown(chart: ChartType): string {
-  return `${thumbnailMarkdown(chart)}${chart.use}`;
+  return `${thumbnailMarkdown(chart, PANEL_THUMBNAIL)}${chart.use}`;
 }
 
 export default function ChartList(props: BrowseProps) {
@@ -54,11 +56,10 @@ export default function ChartList(props: BrowseProps) {
       searchBarAccessory={<ViewDropdown value={viewMode} onChange={onViewModeChange} />}
     >
       {sections.map((section) => (
-        <List.Section key={section.id} title={section.title} subtitle={String(section.charts.length)}>
+        <List.Section key={section.id} title={section.title}>
           {section.charts.map((chart) => (
             <List.Item
               key={`${section.id}-${chart.id}`}
-              icon={familyInfo(chart.family).icon}
               title={chart.name}
               subtitle={showDetail ? undefined : chart.use}
               keywords={searchKeywords(chart)}

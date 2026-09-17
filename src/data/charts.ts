@@ -115,7 +115,6 @@ export const CHARTS: ChartType[] = [
     mermaid: {
       keyword: "sankey-beta",
       since: "10.3",
-      beta: true,
       docs: mermaidDocs("sankey"),
       template: `sankey-beta
 
@@ -157,7 +156,6 @@ tf 04 rmo CartView`,
     mermaid: {
       keyword: "swimlane-beta",
       since: "11.16",
-      beta: true,
       docs: mermaidDocs("swimlanes"),
       template: `swimlane-beta LR
   subgraph Customer
@@ -185,7 +183,6 @@ tf 04 rmo CartView`,
     mermaid: {
       keyword: "architecture-beta",
       since: "11.1",
-      beta: true,
       docs: mermaidDocs("architecture"),
       template: `architecture-beta
   group api(cloud)[API]
@@ -265,7 +262,6 @@ tf 04 rmo CartView`,
     mermaid: {
       keyword: "block-beta",
       since: "10.8",
-      beta: true,
       docs: mermaidDocs("block"),
       template: `block-beta
   columns 3
@@ -283,7 +279,6 @@ tf 04 rmo CartView`,
     mermaid: {
       keyword: "packet-beta",
       since: "11.0",
-      beta: true,
       docs: mermaidDocs("packet"),
       template: `packet-beta
 0-15: "Source port"
@@ -354,7 +349,6 @@ tf 04 rmo CartView`,
     mermaid: {
       keyword: "treeView-beta",
       since: "11.14",
-      beta: true,
       docs: mermaidDocs("treeView"),
       template: `treeView-beta
 ├── src/
@@ -375,7 +369,6 @@ tf 04 rmo CartView`,
     mermaid: {
       keyword: "treemap-beta",
       since: "11.8",
-      beta: true,
       docs: mermaidDocs("treemap"),
       template: `treemap-beta
 "Engineering"
@@ -428,7 +421,6 @@ tf 04 rmo CartView`,
     mermaid: {
       keyword: "xychart-beta",
       since: "10.6",
-      beta: true,
       docs: mermaidDocs("xyChart"),
       template: `xychart-beta
   title "Revenue by quarter"
@@ -449,7 +441,6 @@ tf 04 rmo CartView`,
     mermaid: {
       keyword: "xychart-beta",
       since: "10.6",
-      beta: true,
       docs: mermaidDocs("xyChart"),
       template: `xychart-beta
   title "Signups per month"
@@ -483,7 +474,6 @@ tf 04 rmo CartView`,
     mermaid: {
       keyword: "radar-beta",
       since: "11.6",
-      beta: true,
       docs: mermaidDocs("radar"),
       template: `radar-beta
   title Skills
@@ -659,7 +649,6 @@ tf 04 rmo CartView`,
     mermaid: {
       keyword: "venn-beta",
       since: "11.12.3",
-      beta: true,
       docs: mermaidDocs("venn"),
       template: `venn-beta
   title What makes a good feature
@@ -679,7 +668,6 @@ tf 04 rmo CartView`,
     mermaid: {
       keyword: "ishikawa-beta",
       since: "11.12.3",
-      beta: true,
       docs: mermaidDocs("ishikawa"),
       template: `ishikawa-beta
     Late deliveries
@@ -702,7 +690,6 @@ tf 04 rmo CartView`,
     mermaid: {
       keyword: "wardley-beta",
       since: "11.14",
-      beta: true,
       docs: mermaidDocs("wardley"),
       template: `wardley-beta
 title Tea shop value chain
@@ -731,7 +718,6 @@ evolve Kettle 0.62`,
     mermaid: {
       keyword: "cynefin-beta",
       since: "11.16",
-      beta: true,
       docs: mermaidDocs("cynefin"),
       template: `cynefin-beta
   title Incident response
@@ -761,7 +747,6 @@ evolve Kettle 0.62`,
     mermaid: {
       keyword: "usecase-beta",
       since: "12.0",
-      beta: true,
       docs: mermaidDocs("usecase"),
       template: `usecase-beta
 direction LR

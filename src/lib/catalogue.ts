@@ -7,7 +7,6 @@ export interface MermaidSupport {
   keyword: string;
   /** Mermaid release that added the type. Absent means long-standing. */
   since?: string;
-  beta?: boolean;
   docs: string;
   /** A complete, valid example, short enough to read at a glance. */
   template: string;
@@ -81,9 +80,21 @@ export function docsUrl(chart: ChartType): string | undefined {
   return chart.mermaid?.docs ?? chart.shadcn?.docs ?? chart.echarts?.docs;
 }
 
+/** "Mermaid 11.6+" for types with a known first release, "Mermaid" for long-standing ones. */
 export function mermaidTag(chart: ChartType): string | undefined {
   if (!chart.mermaid) return undefined;
-  return chart.mermaid.since ? `Mermaid ${chart.mermaid.since}` : "Mermaid";
+  return chart.mermaid.since ? `Mermaid ${chart.mermaid.since}+` : "Mermaid";
+}
+
+/** The keyword with its first release folded in: "radar-beta, 11.6+". */
+export function mermaidLabel(chart: ChartType): string | undefined {
+  if (!chart.mermaid) return undefined;
+  return chart.mermaid.since ? `${chart.mermaid.keyword}, ${chart.mermaid.since}+` : chart.mermaid.keyword;
+}
+
+/** Providers that cannot draw the chart, in display order. */
+export function missingProviders(chart: ChartType): Provider[] {
+  return PROVIDER_ORDER.filter((provider) => !chart[provider]);
 }
 
 export function shadcnAddCommand(chart: ChartType): string | undefined {
