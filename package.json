@@ -3,7 +3,7 @@
   "name": "charter",
   "title": "Charter",
   "description": "A catalogue of chart and diagram types, showing which Mermaid, shadcn or ECharts can draw, with docs links, templates and prompt snippets one keystroke away",
-  "icon": "extension-icon.png",
+  "icon": "charter.png",
   "author": "aic",
   "platforms": [
     "macOS",
