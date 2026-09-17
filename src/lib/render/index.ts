@@ -15,17 +15,17 @@ function isDark(): boolean {
 }
 
 /** Draws with the preferred or first installed browser; reports when there is none rather than throwing. */
-export async function renderChart(source: ChartSource): Promise<RenderOutcome> {
+export async function renderChart(source: ChartSource, signal?: AbortSignal): Promise<RenderOutcome> {
   const { browser } = getPreferenceValues<Preferences>();
   const executable = findBrowser(browser?.path);
   if (!executable) return { status: "no-browser" };
-  const image = await renderInBrowser(source, { executable, vendorDir, workDir, dark: isDark() });
+  const image = await renderInBrowser(source, { executable, vendorDir, workDir, dark: isDark(), signal });
   return { status: "ok", image };
 }
 
 /** The network route, taken only when the user asks for it. */
-export async function renderChartWithKroki(source: ChartSource): Promise<RenderOutcome> {
+export async function renderChartWithKroki(source: ChartSource, signal?: AbortSignal): Promise<RenderOutcome> {
   const { krokiUrl } = getPreferenceValues<Preferences>();
-  const image = await renderWithKroki(source, krokiUrl || DEFAULT_KROKI_URL, isDark(), workDir);
+  const image = await renderWithKroki(source, krokiUrl || DEFAULT_KROKI_URL, isDark(), workDir, signal);
   return { status: "ok", image };
 }

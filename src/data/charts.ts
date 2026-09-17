@@ -752,7 +752,3 @@ Customer --> Track`,
     },
   },
 ];
-
-export function chartById(id: string): ChartType | undefined {
-  return CHARTS.find((chart) => chart.id === id);
-}

@@ -1,4 +1,4 @@
-import { Color, Image } from "@raycast/api";
+import { Color, environment, Image } from "@raycast/api";
 import { THUMBNAILS } from "../data/thumbnails";
 import { familyInfo } from "../data/families";
 import type { ChartType } from "./catalogue";
@@ -9,9 +9,14 @@ export function hasThumbnail(chart: ChartType): boolean {
   return available.has(chart.id);
 }
 
-/** Asset path Raycast resolves against the assets folder, with an @dark variant picked up automatically. */
+/** Asset path Raycast resolves against the assets folder; image props pick up the @dark variant themselves. */
 export function thumbnailPath(chart: ChartType): string {
   return `charts/${chart.id}.png`;
+}
+
+/** Markdown gets no automatic @dark lookup, so the dark file is named outright. */
+function markdownThumbnailPath(chart: ChartType): string {
+  return environment.appearance === "dark" ? `charts/${chart.id}@dark.png` : thumbnailPath(chart);
 }
 
 /** Grid tile: the thumbnail when it exists, otherwise the family icon. */
@@ -28,5 +33,5 @@ export function tileContent(chart: ChartType): Image.ImageLike {
 export function thumbnailMarkdown(chart: ChartType, size?: { width: number; height: number }): string {
   if (!hasThumbnail(chart)) return "";
   const query = size ? `?raycast-width=${size.width}&raycast-height=${size.height}` : "";
-  return `![${chart.name}](${thumbnailPath(chart)}${query})\n\n`;
+  return `![${chart.name}](${markdownThumbnailPath(chart)}${query})\n\n`;
 }

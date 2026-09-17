@@ -6,12 +6,8 @@ import { docsUrl, fencedTemplate, promptSnippet, shadcnAddCommand, type ChartTyp
 import ChartDetail from "./ChartDetail";
 import RenderView from "./RenderView";
 
-/** One shortcut for both platforms: cmd on macOS, ctrl on Windows, and opt spelt alt there. */
 function shortcut(key: Keyboard.KeyEquivalent, ...extra: Keyboard.KeyModifier[]): Keyboard.Shortcut {
-  return {
-    macOS: { modifiers: ["cmd", ...extra], key },
-    Windows: { modifiers: ["ctrl", ...extra.map((modifier) => (modifier === "opt" ? "alt" : modifier))], key },
-  };
+  return { modifiers: ["cmd", ...extra], key };
 }
 
 export interface ChartActionsProps {
@@ -172,7 +168,7 @@ export default function ChartActions({ chart, isFavourite, onToggleFavourite, on
           <Action
             title={browse.showDetail ? "Hide Details" : "Show Details"}
             icon={Icon.Sidebar}
-            shortcut={shortcut("d")}
+            shortcut={shortcut("d", "shift")}
             onAction={browse.onToggleDetail}
           />
         )}

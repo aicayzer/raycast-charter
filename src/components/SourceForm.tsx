@@ -33,7 +33,6 @@ export default function SourceForm({ initial = "" }: SourceFormProps) {
 
   return (
     <Form
-      navigationTitle="Render Chart"
       actions={
         <ActionPanel>
           <Action.SubmitForm title="Render" icon={Icon.Image} onSubmit={submit} />

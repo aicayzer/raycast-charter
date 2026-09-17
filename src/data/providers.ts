@@ -6,7 +6,6 @@ export interface ProviderInfo {
   title: string;
   /** Tag colour in list accessories and metadata. */
   color: Color;
-  home: string;
 }
 
 export const PROVIDERS: Record<Provider, ProviderInfo> = {
@@ -14,18 +13,15 @@ export const PROVIDERS: Record<Provider, ProviderInfo> = {
     id: "mermaid",
     title: "Mermaid",
     color: Color.Magenta,
-    home: "https://mermaid.js.org/",
   },
   shadcn: {
     id: "shadcn",
     title: "shadcn",
-    color: Color.PrimaryText,
-    home: "https://ui.shadcn.com/charts",
+    color: Color.SecondaryText,
   },
   echarts: {
     id: "echarts",
     title: "ECharts",
     color: Color.Red,
-    home: "https://echarts.apache.org/",
   },
 };

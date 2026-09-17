@@ -2,12 +2,11 @@
   "$schema": "https://www.raycast.com/schemas/extension.json",
   "name": "charter",
   "title": "Charter",
-  "description": "A catalogue of chart and diagram types, showing which Mermaid, shadcn or ECharts can draw, with docs links, templates and prompt snippets one keystroke away",
+  "description": "A catalogue of chart and diagram types showing which of Mermaid, shadcn or ECharts can draw each one, with docs links, templates and prompt snippets a keystroke away, and a renderer that draws Mermaid or ECharts on your machine",
   "icon": "charter.png",
   "author": "aic",
   "platforms": [
-    "macOS",
-    "Windows"
+    "macOS"
   ],
   "categories": [
     "Developer Tools",
@@ -48,7 +47,6 @@
       "placeholder": "https://kroki.io"
     }
   ],
-  "tools": [],
   "dependencies": {
     "@raycast/api": "^2.4.1",
     "@raycast/utils": "^2.3.1",

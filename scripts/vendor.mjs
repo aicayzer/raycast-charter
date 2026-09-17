@@ -2,9 +2,10 @@
 // assets/vendor, where the Render Chart command and the thumbnail script load
 // them from. Run after bumping either package: npm run vendor.
 import { copyFileSync, mkdirSync, readFileSync } from "node:fs";
-import { join, resolve } from "node:path";
+import { join } from "node:path";
+import { fileURLToPath } from "node:url";
 
-const root = resolve(new URL("..", import.meta.url).pathname);
+const root = fileURLToPath(new URL("..", import.meta.url));
 const outDir = join(root, "assets", "vendor");
 mkdirSync(outDir, { recursive: true });
 

@@ -23,7 +23,7 @@ async function findSource(context?: RenderContext): Promise<ChartSource | undefi
 export default function RenderChart(props: LaunchProps<{ launchContext?: RenderContext }>) {
   const { data, isLoading } = usePromise(findSource, [props.launchContext]);
 
-  if (isLoading) return <Detail isLoading navigationTitle="Render Chart" />;
+  if (isLoading) return <Detail isLoading />;
   if (data) return <RenderView source={data} />;
   return <SourceForm />;
 }

@@ -12,7 +12,7 @@ import {
 import { showFailureToast, usePromise } from "@raycast/utils";
 import { copyFileSync, readFileSync } from "node:fs";
 import { homedir } from "node:os";
-import { join } from "node:path";
+import { basename, join } from "node:path";
 import { useMemo, useRef, useState } from "react";
 import { renderChart, renderChartWithKroki } from "../lib/render";
 import { BROWSER_NAMES } from "../lib/render/browser";
@@ -21,13 +21,13 @@ import SourceForm from "./SourceForm";
 
 interface RenderViewProps {
   source: ChartSource;
-  /** The catalogue type when rendering a template, else the command name. */
+  /** Set when pushed from the catalogue, where the type is the natural title. At the root it stays unset. */
   title?: string;
 }
 
 type Route = "browser" | "kroki";
 
-/** A plain fence: Raycast draws ```mermaid blocks itself, which would show a second picture. */
+/** A plain fence: Raycast draws ```mermaid blocks in Detail itself, which would show a second picture. */
 function sourceBlock(source: ChartSource): string {
   return "```" + (source.kind === "echarts" ? "json" : "") + "\n" + source.text + "\n```";
 }
@@ -43,7 +43,7 @@ function abortError(): Error {
   return error;
 }
 
-export default function RenderView({ source, title = "Render Chart" }: RenderViewProps) {
+export default function RenderView({ source, title }: RenderViewProps) {
   const [route, setRoute] = useState<Route>("browser");
   const abortable = useRef<AbortController>(undefined);
   const { data, error, isLoading, revalidate } = usePromise(
@@ -52,7 +52,7 @@ export default function RenderView({ source, title = "Render Chart" }: RenderVie
       const signal = abortable.current?.signal;
       await new Promise((settle) => setTimeout(settle, 0));
       if (signal?.aborted) throw abortError();
-      return route === "kroki" ? renderChartWithKroki(source) : renderChart(source);
+      return route === "kroki" ? renderChartWithKroki(source, signal) : renderChart(source, signal);
     },
     [source, route],
     // The failure is the content of the view, so the default toast would say it twice.
@@ -74,7 +74,7 @@ export default function RenderView({ source, title = "Render Chart" }: RenderVie
       await showToast({
         style: Toast.Style.Success,
         title: "Saved to Downloads",
-        message: target.split("/").pop(),
+        message: basename(target),
         primaryAction: { title: "Show in Finder", onAction: () => showInFinder(target) },
       });
     } catch (saveError) {
@@ -82,34 +82,40 @@ export default function RenderView({ source, title = "Render Chart" }: RenderVie
     }
   }
 
-  const sourceActions = (
-    <ActionPanel.Section title="Source">
-      <Action.Push
-        title="Edit Source"
-        icon={Icon.Pencil}
-        shortcut={Keyboard.Shortcut.Common.Edit}
-        target={<SourceForm initial={source.text} />}
-      />
-      <Action.CopyToClipboard title="Copy Source" content={source.text} shortcut={Keyboard.Shortcut.Common.Copy} />
-      <Action
-        title="Render Again"
-        icon={Icon.ArrowClockwise}
-        shortcut={Keyboard.Shortcut.Common.Refresh}
-        onAction={revalidate}
-      />
-    </ActionPanel.Section>
+  const editSource = (
+    <Action.Push
+      title="Edit Source"
+      icon={Icon.Pencil}
+      shortcut={Keyboard.Shortcut.Common.Edit}
+      target={<SourceForm initial={source.text} />}
+    />
+  );
+  const copySource = (
+    <Action.CopyToClipboard title="Copy Source" content={source.text} shortcut={Keyboard.Shortcut.Common.Copy} />
+  );
+  const renderAgain = (
+    <Action
+      title="Render Again"
+      icon={Icon.ArrowClockwise}
+      shortcut={Keyboard.Shortcut.Common.Refresh}
+      onAction={revalidate}
+    />
   );
 
   if (error) {
     return (
       <Detail
         navigationTitle={title}
+        isLoading={isLoading}
         markdown={`## ${label} could not be drawn\n\n\`\`\`\n${error.message}\n\`\`\`\n\n${sourceBlock(source)}`}
         actions={
           <ActionPanel>
-            <Action.Push title="Edit Source" icon={Icon.Pencil} target={<SourceForm initial={source.text} />} />
+            {editSource}
             <Action.CopyToClipboard title="Copy Error" content={error.message} />
-            {sourceActions}
+            <ActionPanel.Section title="Source">
+              {copySource}
+              {renderAgain}
+            </ActionPanel.Section>
           </ActionPanel>
         }
       />
@@ -121,6 +127,7 @@ export default function RenderView({ source, title = "Render Chart" }: RenderVie
     return (
       <Detail
         navigationTitle={title}
+        isLoading={isLoading}
         markdown={
           `## No browser to draw with\n\n` +
           `Charter draws charts in a Chromium-based browser installed on this Mac. None of ${names} was found in Applications.\n\n` +
@@ -135,7 +142,11 @@ export default function RenderView({ source, title = "Render Chart" }: RenderVie
             {source.kind === "mermaid" && (
               <Action title="Draw with Kroki" icon={Icon.Globe} onAction={() => setRoute("kroki")} />
             )}
-            {sourceActions}
+            <ActionPanel.Section title="Source">
+              {editSource}
+              {copySource}
+              {renderAgain}
+            </ActionPanel.Section>
           </ActionPanel>
         }
       />
@@ -171,7 +182,11 @@ export default function RenderView({ source, title = "Render Chart" }: RenderVie
               <Action.ShowInFinder path={image.path} />
             </ActionPanel.Section>
           )}
-          {sourceActions}
+          <ActionPanel.Section title="Source">
+            {editSource}
+            {copySource}
+            {renderAgain}
+          </ActionPanel.Section>
         </ActionPanel>
       }
     />

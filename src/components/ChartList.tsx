@@ -1,4 +1,4 @@
-import { Color, List } from "@raycast/api";
+import { List } from "@raycast/api";
 import { PROVIDERS } from "../data/providers";
 import { mermaidTag, searchKeywords, type ChartType } from "../lib/catalogue";
 import { thumbnailMarkdown } from "../lib/thumbnails";
@@ -14,7 +14,7 @@ function accessories(chart: ChartType, compact: boolean): List.Item.Accessory[] 
     items.push({ tag: { value: compact ? "M" : mermaid, color: PROVIDERS.mermaid.color }, tooltip: mermaid });
   if (chart.shadcn) {
     items.push({
-      tag: { value: compact ? "S" : PROVIDERS.shadcn.title, color: Color.SecondaryText },
+      tag: { value: compact ? "S" : PROVIDERS.shadcn.title, color: PROVIDERS.shadcn.color },
       tooltip: "shadcn",
     });
   }

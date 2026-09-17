@@ -45,10 +45,6 @@ export type ProviderFilter = "all" | Provider;
 
 export const PROVIDER_ORDER: Provider[] = ["mermaid", "shadcn", "echarts"];
 
-export function providersFor(chart: ChartType): Provider[] {
-  return PROVIDER_ORDER.filter((provider) => Boolean(chart[provider]));
-}
-
 export function matchesFilter(chart: ChartType, filter: ProviderFilter): boolean {
   return filter === "all" || Boolean(chart[filter]);
 }
