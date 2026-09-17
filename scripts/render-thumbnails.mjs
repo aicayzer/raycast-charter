@@ -45,8 +45,9 @@ async function loadCatalogue() {
   return CHARTS;
 }
 
-const mermaidScript = pathToFileURL(join(root, "node_modules", "mermaid", "dist", "mermaid.min.js")).href;
-const echartsScript = pathToFileURL(join(root, "node_modules", "echarts", "dist", "echarts.min.js")).href;
+// The same copies the Render Chart command ships, so thumbnails match what it draws.
+const mermaidScript = pathToFileURL(join(root, "assets", "vendor", "mermaid.min.js")).href;
+const echartsScript = pathToFileURL(join(root, "assets", "vendor", "echarts.min.js")).href;
 
 const stageStyle = `
   html, body { margin: 0; background: transparent; }

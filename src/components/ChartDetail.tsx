@@ -15,7 +15,8 @@ interface ChartDetailProps {
 export function chartMarkdown(chart: ChartType): string {
   const parts = [`# ${chart.name}`, chart.use, thumbnailMarkdown(chart).trim()];
   if (chart.mermaid) {
-    parts.push(`## ${PROVIDERS.mermaid.title}`, "```mermaid\n" + chart.mermaid.template + "\n```");
+    // A plain fence keeps the syntax readable: Raycast draws ```mermaid blocks itself for the types it knows.
+    parts.push(`## ${PROVIDERS.mermaid.title}`, "```\n" + chart.mermaid.template + "\n```");
     if (chart.mermaid.hint) parts.push(chart.mermaid.hint);
   }
   if (chart.echarts?.note) parts.push(`## ${PROVIDERS.echarts.title}`, chart.echarts.note);

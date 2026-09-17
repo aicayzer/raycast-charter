@@ -21,12 +21,38 @@
       "subtitle": "Charter",
       "description": "Browse chart and diagram types by family, see which provider draws each one, and copy the docs link, template or prompt snippet",
       "mode": "view"
+    },
+    {
+      "name": "render-chart",
+      "title": "Render Chart",
+      "subtitle": "Charter",
+      "description": "Draw a Mermaid diagram or an Apache ECharts option from the selection, the clipboard or a pasted source, then copy or save the picture",
+      "mode": "view"
+    }
+  ],
+  "preferences": [
+    {
+      "name": "browser",
+      "title": "Browser",
+      "description": "A Chromium-based browser that draws the charts. Leave empty to use Google Chrome, Chromium, Brave, Arc or Microsoft Edge, whichever is installed.",
+      "type": "appPicker",
+      "required": false
+    },
+    {
+      "name": "krokiUrl",
+      "title": "Kroki Server",
+      "description": "Draws Mermaid diagrams when no browser is found, and only when you ask. Point it at your own Kroki to keep diagrams off the public server.",
+      "type": "textfield",
+      "required": false,
+      "default": "https://kroki.io",
+      "placeholder": "https://kroki.io"
     }
   ],
   "tools": [],
   "dependencies": {
     "@raycast/api": "^1.104.20",
-    "@raycast/utils": "^2.2.7"
+    "@raycast/utils": "^2.2.7",
+    "puppeteer-core": "^25.11.0"
   },
   "devDependencies": {
     "@raycast/eslint-config": "^2.2.0",
@@ -37,7 +63,6 @@
     "eslint": "^10.5.0",
     "mermaid": "^12.0.0",
     "prettier": "^3.8.5",
-    "puppeteer-core": "^25.11.0",
     "typescript": "^6.0.3"
   },
   "scripts": {
@@ -47,6 +72,7 @@
     "lint": "ray lint && node scripts/check-dashes.mjs",
     "prepublishOnly": "echo \"\\n\\nIt seems like you are trying to publish the Raycast extension to npm.\\n\\nIf you did intend to publish it to npm, remove the \\`prepublishOnly\\` script and rerun \\`npm publish\\` again.\\nIf you wanted to publish it to the Raycast Store instead, use \\`npm run publish\\` instead.\\n\\n\" && exit 1",
     "publish": "npx @raycast/api@latest publish",
-    "thumbnails": "node scripts/render-thumbnails.mjs"
+    "thumbnails": "node scripts/render-thumbnails.mjs",
+    "vendor": "node scripts/vendor.mjs"
   }
 }
