@@ -4,12 +4,13 @@ import { PROVIDERS } from "../data/providers";
 import { MAX_COLUMNS, MIN_COLUMNS, type ViewMode } from "../hooks/useViewMode";
 import { docsUrl, fencedTemplate, promptSnippet, shadcnAddCommand, type ChartType } from "../lib/catalogue";
 import ChartDetail from "./ChartDetail";
+import RenderView from "./RenderView";
 
-/** One shortcut for both platforms: cmd on macOS, ctrl on Windows, same extra modifiers and key. */
+/** One shortcut for both platforms: cmd on macOS, ctrl on Windows, and opt spelt alt there. */
 function shortcut(key: Keyboard.KeyEquivalent, ...extra: Keyboard.KeyModifier[]): Keyboard.Shortcut {
   return {
     macOS: { modifiers: ["cmd", ...extra], key },
-    Windows: { modifiers: ["ctrl", ...extra], key },
+    Windows: { modifiers: ["ctrl", ...extra.map((modifier) => (modifier === "opt" ? "alt" : modifier))], key },
   };
 }
 
@@ -84,6 +85,15 @@ export default function ChartActions({ chart, isFavourite, onToggleFavourite, on
           />
         )}
         {!docsFirst && docs && <Action.OpenInBrowser title="Open Docs" url={docs} onOpen={used} />}
+        {chart.mermaid && (
+          <Action.Push
+            title="Render Template"
+            icon={Icon.Image}
+            shortcut={shortcut("r", "shift")}
+            target={<RenderView source={{ kind: "mermaid", text: chart.mermaid.template }} title={chart.name} />}
+            onPush={used}
+          />
+        )}
       </ActionPanel.Section>
 
       <ActionPanel.Section title="Copy">
@@ -107,7 +117,7 @@ export default function ChartActions({ chart, isFavourite, onToggleFavourite, on
           <Action.CopyToClipboard
             title="Copy Raw Template"
             content={chart.mermaid.template}
-            shortcut={shortcut("r", "shift")}
+            shortcut={shortcut("t", "opt")}
             onCopy={used}
           />
         )}
