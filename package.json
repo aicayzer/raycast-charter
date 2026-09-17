@@ -1,0 +1,76 @@
+{
+  "$schema": "https://www.raycast.com/schemas/extension.json",
+  "name": "charter",
+  "title": "Charter",
+  "description": "A catalogue of chart and diagram types, showing which Mermaid, shadcn or ECharts can draw, with docs links, templates and prompt snippets one keystroke away",
+  "icon": "extension-icon.png",
+  "author": "aic",
+  "platforms": [
+    "macOS",
+    "Windows"
+  ],
+  "categories": [
+    "Developer Tools",
+    "Documentation"
+  ],
+  "license": "MIT",
+  "commands": [
+    {
+      "name": "browse-charts",
+      "title": "Browse Charts",
+      "subtitle": "Charter",
+      "description": "Browse chart and diagram types by family, see which provider draws each one, and copy the docs link, template or prompt snippet",
+      "mode": "view"
+    }
+  ],
+  "preferences": [
+    {
+      "name": "showMermaid",
+      "title": "Chart Providers",
+      "label": "Mermaid",
+      "description": "Show chart types Mermaid can draw",
+      "type": "checkbox",
+      "required": false,
+      "default": true
+    },
+    {
+      "name": "showShadcn",
+      "title": "",
+      "label": "shadcn",
+      "description": "Show chart types shadcn ships a chart recipe for",
+      "type": "checkbox",
+      "required": false,
+      "default": true
+    },
+    {
+      "name": "showEcharts",
+      "title": "",
+      "label": "ECharts",
+      "description": "Show chart types Apache ECharts can draw",
+      "type": "checkbox",
+      "required": false,
+      "default": true
+    }
+  ],
+  "tools": [],
+  "dependencies": {
+    "@raycast/api": "^1.104.20",
+    "@raycast/utils": "^2.2.7"
+  },
+  "devDependencies": {
+    "@raycast/eslint-config": "^2.2.0",
+    "@types/node": "22.19.17",
+    "@types/react": "19.0.10",
+    "eslint": "^10.5.0",
+    "prettier": "^3.8.5",
+    "typescript": "^6.0.3"
+  },
+  "scripts": {
+    "build": "ray build -e dist",
+    "dev": "ray develop",
+    "fix-lint": "ray lint --fix",
+    "lint": "ray lint && node scripts/check-dashes.mjs",
+    "prepublishOnly": "echo \"\\n\\nIt seems like you are trying to publish the Raycast extension to npm.\\n\\nIf you did intend to publish it to npm, remove the \\`prepublishOnly\\` script and rerun \\`npm publish\\` again.\\nIf you wanted to publish it to the Raycast Store instead, use \\`npm run publish\\` instead.\\n\\n\" && exit 1",
+    "publish": "npx @raycast/api@latest publish"
+  }
+}
