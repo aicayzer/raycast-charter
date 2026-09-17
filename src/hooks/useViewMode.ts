@@ -6,10 +6,7 @@ export const MIN_COLUMNS = 2;
 export const MAX_COLUMNS = 6;
 const DEFAULT_COLUMNS = 4;
 
-/**
- * View choices are shared by the search-bar dropdown and the actions,
- * so they live in cached state rather than the dropdown's own storeValue.
- */
+/** View choices live in cached state so they survive between launches. */
 export function useViewMode() {
   const [viewMode, setViewMode] = useCachedState<ViewMode>("charter-view", "grid");
   const [showDetail, setShowDetail] = useCachedState<boolean>("charter-list-detail", true);

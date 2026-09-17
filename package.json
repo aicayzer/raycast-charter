@@ -23,35 +23,6 @@
       "mode": "view"
     }
   ],
-  "preferences": [
-    {
-      "name": "showMermaid",
-      "title": "Chart Providers",
-      "label": "Mermaid",
-      "description": "Show chart types Mermaid can draw",
-      "type": "checkbox",
-      "required": false,
-      "default": true
-    },
-    {
-      "name": "showShadcn",
-      "title": "",
-      "label": "shadcn",
-      "description": "Show chart types shadcn ships a chart recipe for",
-      "type": "checkbox",
-      "required": false,
-      "default": true
-    },
-    {
-      "name": "showEcharts",
-      "title": "",
-      "label": "ECharts",
-      "description": "Show chart types Apache ECharts can draw",
-      "type": "checkbox",
-      "required": false,
-      "default": true
-    }
-  ],
   "tools": [],
   "dependencies": {
     "@raycast/api": "^1.104.20",

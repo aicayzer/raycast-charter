@@ -40,11 +40,8 @@ export interface ChartType {
   notes?: string;
 }
 
-export interface ProviderPreferences {
-  showMermaid: boolean;
-  showShadcn: boolean;
-  showEcharts: boolean;
-}
+/** The search-bar dropdown: every type, or only those one provider can draw. */
+export type ProviderFilter = "all" | Provider;
 
 export const PROVIDER_ORDER: Provider[] = ["mermaid", "shadcn", "echarts"];
 
@@ -52,17 +49,15 @@ export function providersFor(chart: ChartType): Provider[] {
   return PROVIDER_ORDER.filter((provider) => Boolean(chart[provider]));
 }
 
-export function enabledProviders(prefs: ProviderPreferences): Provider[] {
-  const enabled: Provider[] = [];
-  if (prefs.showMermaid) enabled.push("mermaid");
-  if (prefs.showShadcn) enabled.push("shadcn");
-  if (prefs.showEcharts) enabled.push("echarts");
-  return enabled;
+export function matchesFilter(chart: ChartType, filter: ProviderFilter): boolean {
+  return filter === "all" || Boolean(chart[filter]);
 }
 
-export function isVisible(chart: ChartType, prefs: ProviderPreferences): boolean {
-  const enabled = enabledProviders(prefs);
-  return providersFor(chart).some((provider) => enabled.includes(provider));
+/** What the tile says under the name: the keyword for the chosen provider, else the first provider. */
+export function providerLabel(chart: ChartType, filter: ProviderFilter): string | undefined {
+  if (filter === "shadcn") return chart.shadcn?.block;
+  if (filter === "echarts") return chart.echarts?.series;
+  return mermaidTag(chart) ?? (chart.shadcn ? "shadcn" : chart.echarts ? "ECharts" : undefined);
 }
 
 export function groupByFamily(charts: ChartType[]): Map<Family, ChartType[]> {

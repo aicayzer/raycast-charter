@@ -5,7 +5,7 @@ import { thumbnailMarkdown } from "../lib/thumbnails";
 import ChartActions from "./ChartActions";
 import type { BrowseProps } from "./ChartGrid";
 import ChartMetadata from "./ChartMetadata";
-import ViewDropdown from "./ViewDropdown";
+import ProviderDropdown from "./ProviderDropdown";
 
 function accessories(chart: ChartType, compact: boolean): List.Item.Accessory[] {
   const items: List.Item.Accessory[] = [];
@@ -40,6 +40,8 @@ export default function ChartList(props: BrowseProps) {
     isLoading,
     isFavourite,
     onToggleFavourite,
+    filter,
+    onFilterChange,
     viewMode,
     onViewModeChange,
     showDetail,
@@ -53,7 +55,7 @@ export default function ChartList(props: BrowseProps) {
       isLoading={isLoading}
       isShowingDetail={showDetail}
       searchBarPlaceholder="Search chart types"
-      searchBarAccessory={<ViewDropdown value={viewMode} onChange={onViewModeChange} />}
+      searchBarAccessory={<ProviderDropdown value={filter} onChange={onFilterChange} />}
     >
       {sections.map((section) => (
         <List.Section key={section.id} title={section.title}>
