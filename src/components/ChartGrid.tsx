@@ -15,6 +15,8 @@ export interface BrowseProps {
   onViewModeChange: (mode: ViewMode) => void;
   showDetail: boolean;
   onToggleDetail: () => void;
+  columns: number;
+  onColumnsChange: (columns: number) => void;
 }
 
 export default function ChartGrid(props: BrowseProps) {
@@ -27,6 +29,8 @@ export default function ChartGrid(props: BrowseProps) {
     onViewModeChange,
     showDetail,
     onToggleDetail,
+    columns,
+    onColumnsChange,
   } = props;
 
   function subtitle(chart: ChartType): string | undefined {
@@ -36,10 +40,10 @@ export default function ChartGrid(props: BrowseProps) {
   return (
     <Grid
       isLoading={isLoading}
-      columns={3}
+      columns={columns}
       aspectRatio="3/2"
       fit={Grid.Fit.Contain}
-      searchBarPlaceholder="Search chart types, e.g. spider, sankey, org chart"
+      searchBarPlaceholder="Search chart types"
       searchBarAccessory={<ViewDropdown value={viewMode} onChange={onViewModeChange} />}
     >
       {sections.map((section) => (
@@ -61,6 +65,8 @@ export default function ChartGrid(props: BrowseProps) {
                     onSwitchView: () => onViewModeChange("list"),
                     showDetail,
                     onToggleDetail,
+                    columns,
+                    onColumnsChange,
                   }}
                 />
               }

@@ -4,7 +4,7 @@ A catalogue of chart and diagram types for Raycast. Browse by family, see which 
 
 ## Commands
 
-- **Browse Charts** lists every type, grouped by family, with your favourites first. Switch between a grid of thumbnails and a list with a detail panel from the dropdown in the search bar or with `cmd+shift+l`. Search matches names and synonyms, so "spider" finds Radar and "flow of money" finds Sankey.
+- **Browse Charts** lists every type, grouped by family, with your favourites first. Switch between a grid of thumbnails and a list with a detail panel from the dropdown in the search bar or with `cmd+shift+l`; `cmd+=` and `cmd+-` change the tile size. Search matches names and synonyms, so "spider" finds Radar and "flow of money" finds Sankey.
 
 ## What each type shows
 

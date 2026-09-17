@@ -10,7 +10,7 @@ import { buildSections } from "./lib/sections";
 
 export default function BrowseCharts() {
   const prefs = getPreferenceValues<Preferences>();
-  const { viewMode, setViewMode, showDetail, setShowDetail } = useViewMode();
+  const { viewMode, setViewMode, showDetail, setShowDetail, columns, setColumns } = useViewMode();
   const { favourites, isFavourite, toggle, isLoading } = useFavourites();
 
   const sections = useMemo(() => {
@@ -44,6 +44,8 @@ export default function BrowseCharts() {
     onViewModeChange: setViewMode,
     showDetail,
     onToggleDetail: () => setShowDetail(!showDetail),
+    columns,
+    onColumnsChange: setColumns,
   };
 
   return viewMode === "grid" ? <ChartGrid {...browseProps} /> : <ChartList {...browseProps} />;

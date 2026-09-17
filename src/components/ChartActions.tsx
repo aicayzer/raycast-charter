@@ -1,7 +1,7 @@
 import { Action, ActionPanel, Icon, Keyboard, showToast, Toast } from "@raycast/api";
 import { showFailureToast } from "@raycast/utils";
 import { PROVIDERS } from "../data/providers";
-import type { ViewMode } from "../hooks/useViewMode";
+import { MAX_COLUMNS, MIN_COLUMNS, type ViewMode } from "../hooks/useViewMode";
 import { docsUrl, promptSnippet, shadcnAddCommand, type ChartType } from "../lib/catalogue";
 import ChartDetail from "./ChartDetail";
 
@@ -23,6 +23,8 @@ export interface ChartActionsProps {
     onSwitchView: () => void;
     showDetail: boolean;
     onToggleDetail: () => void;
+    columns: number;
+    onColumnsChange: (columns: number) => void;
   };
 }
 
@@ -109,6 +111,22 @@ export default function ChartActions({ chart, isFavourite, onToggleFavourite, br
             icon={Icon.Sidebar}
             shortcut={shortcut("d")}
             onAction={browse.onToggleDetail}
+          />
+        )}
+        {browse && browse.viewMode === "grid" && browse.columns > MIN_COLUMNS && (
+          <Action
+            title="Larger Tiles"
+            icon={Icon.Maximize}
+            shortcut={shortcut("=")}
+            onAction={() => browse.onColumnsChange(browse.columns - 1)}
+          />
+        )}
+        {browse && browse.viewMode === "grid" && browse.columns < MAX_COLUMNS && (
+          <Action
+            title="Smaller Tiles"
+            icon={Icon.Minimize}
+            shortcut={shortcut("-")}
+            onAction={() => browse.onColumnsChange(browse.columns + 1)}
           />
         )}
       </ActionPanel.Section>

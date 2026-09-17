@@ -42,13 +42,15 @@ export default function ChartList(props: BrowseProps) {
     onViewModeChange,
     showDetail,
     onToggleDetail,
+    columns,
+    onColumnsChange,
   } = props;
 
   return (
     <List
       isLoading={isLoading}
       isShowingDetail={showDetail}
-      searchBarPlaceholder="Search chart types, e.g. spider, sankey, org chart"
+      searchBarPlaceholder="Search chart types"
       searchBarAccessory={<ViewDropdown value={viewMode} onChange={onViewModeChange} />}
     >
       {sections.map((section) => (
@@ -72,6 +74,8 @@ export default function ChartList(props: BrowseProps) {
                     onSwitchView: () => onViewModeChange("grid"),
                     showDetail,
                     onToggleDetail,
+                    columns,
+                    onColumnsChange,
                   }}
                 />
               }
