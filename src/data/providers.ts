@@ -29,7 +29,3 @@ export const PROVIDERS: Record<Provider, ProviderInfo> = {
     home: "https://echarts.apache.org/",
   },
 };
-
-export const MERMAID_DOCS = "https://mermaid.js.org/syntax";
-export const SHADCN_CHARTS = "https://ui.shadcn.com/charts";
-export const ECHARTS_OPTION = "https://echarts.apache.org/en/option.html#series";

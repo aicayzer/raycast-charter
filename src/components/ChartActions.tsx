@@ -99,7 +99,7 @@ export default function ChartActions({ chart, isFavourite, onToggleFavourite, br
           <Action
             title={browse.viewMode === "grid" ? "Switch to List View" : "Switch to Grid View"}
             icon={browse.viewMode === "grid" ? Icon.List : Icon.AppWindowGrid3x3}
-            shortcut={shortcut("v", "shift")}
+            shortcut={shortcut("l", "shift")}
             onAction={browse.onSwitchView}
           />
         )}

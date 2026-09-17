@@ -36,9 +36,8 @@ export default function ChartGrid(props: BrowseProps) {
   return (
     <Grid
       isLoading={isLoading}
-      columns={4}
+      columns={3}
       aspectRatio="3/2"
-      inset={Grid.Inset.Small}
       fit={Grid.Fit.Contain}
       searchBarPlaceholder="Search chart types, e.g. spider, sankey, org chart"
       searchBarAccessory={<ViewDropdown value={viewMode} onChange={onViewModeChange} />}

@@ -1,5 +1,5 @@
 import type { ChartType } from "../lib/catalogue";
-import { ECHARTS_OPTION, MERMAID_DOCS, SHADCN_CHARTS } from "./providers";
+import { ECHARTS_OPTION, MERMAID_DOCS, SHADCN_CHARTS } from "./urls";
 
 const mermaidDocs = (page: string) => `${MERMAID_DOCS}/${page}.html`;
 const shadcnDocs = (page: string) => `${SHADCN_CHARTS}/${page}`;
@@ -289,7 +289,11 @@ tf 04 rmo CartView`,
 0-15: "Source port"
 16-31: "Destination port"
 32-63: "Sequence number"
-64-95: "Acknowledgement number"`,
+64-95: "Acknowledgement number"
+96-99: "Offset"
+100-105: "Reserved"
+106-111: "Flags"
+112-127: "Window"`,
     },
   },
   {
