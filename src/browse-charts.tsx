@@ -1,43 +1,50 @@
-import { useState } from "react";
-import { ActionPanel, Action, Icon, Grid, Color } from "@raycast/api";
+import { Action, ActionPanel, getPreferenceValues, Icon, List, openExtensionPreferences } from "@raycast/api";
+import { useMemo } from "react";
+import ChartGrid from "./components/ChartGrid";
+import ChartList from "./components/ChartList";
+import { CHARTS } from "./data/charts";
+import { useFavourites } from "./hooks/useFavourites";
+import { useViewMode } from "./hooks/useViewMode";
+import { enabledProviders, isVisible } from "./lib/catalogue";
+import { buildSections } from "./lib/sections";
 
-export default function Command() {
-  const [columns, setColumns] = useState(5);
-  const [isLoading, setIsLoading] = useState(true);
-  return (
-    <Grid
-      columns={columns}
-      inset={Grid.Inset.Large}
-      isLoading={isLoading}
-      searchBarAccessory={
-        <Grid.Dropdown
-          tooltip="Grid Item Size"
-          storeValue
-          onChange={(newValue) => {
-            setColumns(parseInt(newValue));
-            setIsLoading(false);
-          }}
-        >
-          <Grid.Dropdown.Item title="Large" value={"3"} />
-          <Grid.Dropdown.Item title="Medium" value={"5"} />
-          <Grid.Dropdown.Item title="Small" value={"8"} />
-        </Grid.Dropdown>
-      }
-    >
-      {!isLoading &&
-        Object.entries(Icon).map(([name, icon]) => (
-          <Grid.Item
-            key={name}
-            content={{ value: { source: icon, tintColor: Color.PrimaryText }, tooltip: name }}
-            title={name}
-            subtitle={icon}
-            actions={
-              <ActionPanel>
-                <Action.CopyToClipboard content={icon} />
-              </ActionPanel>
-            }
-          />
-        ))}
-    </Grid>
-  );
+export default function BrowseCharts() {
+  const prefs = getPreferenceValues<Preferences>();
+  const { viewMode, setViewMode, showDetail, setShowDetail } = useViewMode();
+  const { favourites, isFavourite, toggle, isLoading } = useFavourites();
+
+  const sections = useMemo(() => {
+    const visible = CHARTS.filter((chart) => isVisible(chart, prefs));
+    return buildSections(visible, favourites);
+  }, [prefs, favourites]);
+
+  if (enabledProviders(prefs).length === 0) {
+    return (
+      <List>
+        <List.EmptyView
+          icon={Icon.BarChart}
+          title="No chart providers selected"
+          description="Tick Mermaid, shadcn or ECharts in the extension preferences to see the catalogue."
+          actions={
+            <ActionPanel>
+              <Action title="Open Extension Preferences" icon={Icon.Gear} onAction={openExtensionPreferences} />
+            </ActionPanel>
+          }
+        />
+      </List>
+    );
+  }
+
+  const browseProps = {
+    sections,
+    isLoading,
+    isFavourite,
+    onToggleFavourite: toggle,
+    viewMode,
+    onViewModeChange: setViewMode,
+    showDetail,
+    onToggleDetail: () => setShowDetail(!showDetail),
+  };
+
+  return viewMode === "grid" ? <ChartGrid {...browseProps} /> : <ChartList {...browseProps} />;
 }

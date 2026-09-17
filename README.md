@@ -16,7 +16,7 @@ A catalogue of chart and diagram types for Raycast. Browse by family, see which 
 
 - **Open Docs** opens the Mermaid page, or the first provider's page when the type has no Mermaid syntax.
 - **Copy Docs Link**, **Copy Template** and **Copy Prompt Snippet** put the link, a complete example, or a ready-to-paste instruction for a model on the clipboard.
-- **Copy shadcn Add Command** copies `npx shadcn@latest add <block>` when a recipe exists.
+- **Copy Install Command** copies `npx shadcn@latest add <block>` when a recipe exists.
 - **Add to Favourites** pins a type to the top of the catalogue.
 
 ## Preferences
