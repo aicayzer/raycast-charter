@@ -2,7 +2,7 @@ import { Action, ActionPanel, Icon, Keyboard, showToast, Toast } from "@raycast/
 import { showFailureToast } from "@raycast/utils";
 import { PROVIDERS } from "../data/providers";
 import { MAX_COLUMNS, MIN_COLUMNS, type ViewMode } from "../hooks/useViewMode";
-import { docsUrl, promptSnippet, shadcnAddCommand, type ChartType } from "../lib/catalogue";
+import { docsUrl, fencedTemplate, promptSnippet, shadcnAddCommand, type ChartType } from "../lib/catalogue";
 import ChartDetail from "./ChartDetail";
 
 /** One shortcut for both platforms: cmd on macOS, ctrl on Windows, same extra modifiers and key. */
@@ -31,6 +31,7 @@ export interface ChartActionsProps {
 export default function ChartActions({ chart, isFavourite, onToggleFavourite, browse }: ChartActionsProps) {
   const docs = docsUrl(chart);
   const addCommand = shadcnAddCommand(chart);
+  const fenced = fencedTemplate(chart);
   // With the list panel open the page would repeat what is already on screen, so Enter goes to the docs.
   const docsFirst = !browse || (browse.viewMode === "list" && browse.showDetail);
 
@@ -64,11 +65,12 @@ export default function ChartActions({ chart, isFavourite, onToggleFavourite, br
         {docs && (
           <Action.CopyToClipboard title="Copy Docs Link" content={docs} shortcut={Keyboard.Shortcut.Common.Copy} />
         )}
+        {fenced && <Action.CopyToClipboard title="Copy Template" content={fenced} shortcut={shortcut("t", "shift")} />}
         {chart.mermaid && (
           <Action.CopyToClipboard
-            title="Copy Template"
+            title="Copy Raw Template"
             content={chart.mermaid.template}
-            shortcut={shortcut("t", "shift")}
+            shortcut={shortcut("r", "shift")}
           />
         )}
         <Action.CopyToClipboard

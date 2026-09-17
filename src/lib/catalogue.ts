@@ -92,6 +92,11 @@ export function missingProviders(chart: ChartType): Provider[] {
   return PROVIDER_ORDER.filter((provider) => !chart[provider]);
 }
 
+/** The Mermaid template inside a fence, ready to paste into a chat or a Markdown note. */
+export function fencedTemplate(chart: ChartType): string | undefined {
+  return chart.mermaid ? "```mermaid\n" + chart.mermaid.template + "\n```" : undefined;
+}
+
 export function shadcnAddCommand(chart: ChartType): string | undefined {
   return chart.shadcn ? `npx shadcn@latest add ${chart.shadcn.block}` : undefined;
 }
