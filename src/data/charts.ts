@@ -5,9 +5,6 @@ const mermaidDocs = (page: string) => `${MERMAID_DOCS}/${page}.html`;
 const shadcnDocs = (page: string) => `${SHADCN_CHARTS}/${page}`;
 const echartsDocs = (series: string) => `${ECHARTS_OPTION}-${series}`;
 
-const RECHARTS_NO_RECIPE = (component: string) =>
-  `Recharts ships a ${component} component, but shadcn has no chart recipe for it.`;
-
 /**
  * The catalogue. Order within a family is the order shown.
  * `since` is the Mermaid release that added the type, checked against the
@@ -126,7 +123,6 @@ Housing,Bills,100`,
       hint: "Three columns per line: source, target, value. No header row.",
     },
     echarts: { series: "sankey", docs: echartsDocs("sankey") },
-    notes: RECHARTS_NO_RECIPE("Sankey"),
   },
   {
     id: "eventmodeling",
@@ -380,7 +376,6 @@ tf 04 rmo CartView`,
       hint: "Quote every label. A line without a value is a group; indented lines with values are its children.",
     },
     echarts: { series: "treemap", docs: echartsDocs("treemap") },
-    notes: RECHARTS_NO_RECIPE("Treemap"),
   },
   {
     id: "sunburst",
@@ -389,7 +384,6 @@ tf 04 rmo CartView`,
     synonyms: ["radial treemap", "multilevel pie", "rings", "hierarchy pie"],
     use: "A hierarchy as concentric rings, each ring one level deeper.",
     echarts: { series: "sunburst", docs: echartsDocs("sunburst") },
-    notes: RECHARTS_NO_RECIPE("SunburstChart"),
   },
   {
     id: "pie",
@@ -516,7 +510,6 @@ tf 04 rmo CartView`,
     synonyms: ["bubble", "dot plot", "xy", "correlation"],
     use: "Two numeric variables per point, to see correlation and outliers.",
     echarts: { series: "scatter", docs: echartsDocs("scatter") },
-    notes: RECHARTS_NO_RECIPE("ScatterChart"),
   },
   {
     id: "heatmap",
@@ -533,7 +526,6 @@ tf 04 rmo CartView`,
     synonyms: ["pipeline", "conversion", "drop off", "stages"],
     use: "Stages that narrow, such as visitors to customers.",
     echarts: { series: "funnel", docs: echartsDocs("funnel") },
-    notes: RECHARTS_NO_RECIPE("FunnelChart"),
   },
   {
     id: "boxplot",
