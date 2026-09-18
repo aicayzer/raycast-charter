@@ -23,6 +23,21 @@ for (const [pkg, file] of files) {
 
 const topology = JSON.parse(readFileSync(join(root, "node_modules", "world-atlas", "countries-110m.json"), "utf8"));
 const countries = feature(topology, topology.objects.countries);
+
+// Rings that cross the antimeridian (Russia, Fiji) draw as a line across the
+// whole map. Unwrapping their western points past 180 keeps each ring whole.
+// Antarctica genuinely spans the width and stays as it is.
+function unwrap(ring) {
+  const crosses = ring.some(([lon]) => lon > 170) && ring.some(([lon]) => lon < -170);
+  if (!crosses) return ring;
+  const unwrapped = ring.map(([lon, lat]) => [lon < 0 ? lon + 360 : lon, lat]);
+  const lons = unwrapped.map(([lon]) => lon);
+  return Math.max(...lons) - Math.min(...lons) < 180 ? unwrapped : ring;
+}
+for (const { geometry } of countries.features) {
+  if (geometry.type === "Polygon") geometry.coordinates = geometry.coordinates.map(unwrap);
+  if (geometry.type === "MultiPolygon") geometry.coordinates = geometry.coordinates.map((polygon) => polygon.map(unwrap));
+}
 const maps = { world: countries };
 writeFileSync(join(outDir, "maps.js"), `window.CHARTER_MAPS = ${JSON.stringify(maps)};\n`);
 console.log(`world-atlas 110m (${countries.features.length} countries) -> assets/vendor/maps.js`);
