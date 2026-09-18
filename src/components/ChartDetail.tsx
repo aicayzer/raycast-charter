@@ -1,6 +1,6 @@
 import { Detail } from "@raycast/api";
 import { PROVIDERS } from "../data/providers";
-import { rawTemplate, shadcnAddCommand, type ChartType, type Provider } from "../lib/catalogue";
+import { rawTemplate, shadcnAddCommand, shadcnVariants, type ChartType, type Provider } from "../lib/catalogue";
 import { thumbnailMarkdown } from "../lib/thumbnails";
 import ChartActions from "./ChartActions";
 import ChartMetadata from "./ChartMetadata";
@@ -23,7 +23,16 @@ export function providerSection(chart: ChartType, provider: Provider): string {
   if (template) parts.push("```\n" + template + "\n```");
   if (provider === "mermaid" && chart.mermaid?.hint) parts.push(chart.mermaid.hint);
   if (provider === "echarts" && chart.echarts?.hint) parts.push(chart.echarts.hint);
-  if (provider === "shadcn" && chart.shadcn) parts.push("```\n" + shadcnAddCommand(chart) + "\n```");
+  if (provider === "shadcn" && chart.shadcn) {
+    parts.push("```\n" + shadcnAddCommand(chart.shadcn.block) + "\n```");
+    const variants = shadcnVariants(chart).filter((block) => block.name !== chart.shadcn?.block);
+    if (variants.length > 0) {
+      parts.push(
+        "### Variants",
+        variants.map((block) => `- **${block.title}**: \`${shadcnAddCommand(block.name)}\``).join("\n"),
+      );
+    }
+  }
   return parts.join("\n\n");
 }
 

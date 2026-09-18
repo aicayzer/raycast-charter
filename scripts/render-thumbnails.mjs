@@ -17,8 +17,8 @@ const HEIGHT = 600;
 const PAD = 12;
 /** ECharts draws at half size and double density so labels read at tile size. */
 const ECHARTS_SCALE = 2;
-/** Width at which a shadcn card lands near 3:2. */
-const SHADCN_WIDTH = 640;
+/** The shadcn card is fixed at this width and centred on the 3:2 stage. */
+const SHADCN_CARD_WIDTH = 640;
 const PROVIDERS = ["mermaid", "shadcn", "echarts"];
 
 const CHROME_CANDIDATES = [
@@ -89,15 +89,24 @@ async function renderLocal(page, source, dark, target) {
   rmSync(file, { force: true });
 }
 
+/** The real block from ui.shadcn.com, its card centred on a transparent 3:2 stage. */
 async function renderShadcn(page, block, dark, target) {
-  await page.setViewport({ width: SHADCN_WIDTH, height: 800, deviceScaleFactor: 2 });
+  await page.setViewport({ width: WIDTH, height: HEIGHT, deviceScaleFactor: 2 });
   await page.emulateMediaFeatures([{ name: "prefers-color-scheme", value: dark ? "dark" : "light" }]);
   await page.goto(`${SHADCN_VIEW}/${block}`, { waitUntil: "networkidle0", timeout: 60000 });
   await page.waitForSelector("svg.recharts-surface", { timeout: 30000 });
-  await new Promise((done) => setTimeout(done, 500));
   const card = await page.$("[data-slot=card]");
   if (!card) throw new Error(`no card on the preview page for ${block}`);
-  await card.screenshot({ path: target, omitBackground: true });
+  await page.addStyleTag({
+    content: `
+      html, body { margin: 0 !important; padding: 0 !important; background: transparent !important; overflow: hidden; }
+      [data-slot=card] { position: fixed; left: 50%; top: 50%; transform: translate(-50%, -50%);
+        width: ${SHADCN_CARD_WIDTH}px; max-height: ${HEIGHT}px; }
+    `,
+  });
+  // Recharts refits the chart after the card changes width.
+  await new Promise((done) => setTimeout(done, 600));
+  await page.screenshot({ path: target, omitBackground: true, clip: { x: 0, y: 0, width: WIDTH, height: HEIGHT } });
 }
 
 function sourceFor(chart, provider) {

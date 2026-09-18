@@ -10,6 +10,7 @@ import {
   rawTemplate,
   shadcnAddCommand,
   shadcnPreviewUrl,
+  shadcnVariants,
   type ChartType,
   type Provider,
 } from "../lib/catalogue";
@@ -48,8 +49,9 @@ export default function ChartActions(props: ChartActionsProps) {
   const docs = docsUrl(chart, provider);
   const fenced = fencedTemplate(chart, provider);
   const raw = rawTemplate(chart, provider);
-  const addCommand = shadcnAddCommand(chart);
+  const addCommand = chart.shadcn ? shadcnAddCommand(chart.shadcn.block) : undefined;
   const preview = shadcnPreviewUrl(chart);
+  const variants = shadcnVariants(chart);
   // With the list panel open the page would repeat what is already on screen, so Enter goes to the docs.
   const docsFirst = !browse || (browse.viewMode === "list" && browse.showDetail);
   const others = PROVIDER_ORDER.filter((other) => other !== provider && rawTemplate(chart, other));
@@ -161,6 +163,30 @@ export default function ChartActions(props: ChartActionsProps) {
             shortcut={shortcut("i", "shift")}
             onCopy={used}
           />
+        )}
+        {variants.length > 1 && (
+          <ActionPanel.Submenu title="Copy Variant Install Command" icon={Icon.Terminal}>
+            {variants.map((block) => (
+              <Action.CopyToClipboard
+                key={block.name}
+                title={block.title}
+                content={shadcnAddCommand(block.name)}
+                onCopy={used}
+              />
+            ))}
+          </ActionPanel.Submenu>
+        )}
+        {variants.length > 1 && (
+          <ActionPanel.Submenu title="Copy Variant Component" icon={Icon.Code}>
+            {variants.map((block) => (
+              <Action.CopyToClipboard
+                key={block.name}
+                title={block.title}
+                content={"```tsx\n" + block.source + "\n```"}
+                onCopy={used}
+              />
+            ))}
+          </ActionPanel.Submenu>
         )}
       </ActionPanel.Section>
 

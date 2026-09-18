@@ -1,3 +1,4 @@
+import { SHADCN_BLOCKS } from "../data/shadcn";
 import { SHADCN_VIEW } from "../data/urls";
 
 export type Provider = "mermaid" | "shadcn" | "echarts";
@@ -19,8 +20,21 @@ export interface MermaidSupport {
   hint?: string;
 }
 
+export type ShadcnFamily = "area" | "bar" | "line" | "pie" | "radar" | "radial";
+
+/** One registry block, pulled by scripts/shadcn.mjs. */
+export interface ShadcnBlock {
+  name: string;
+  /** The part after the dash in the block's card title: "Horizontal", "Stacked", or "Default". */
+  title: string;
+  /** The component as the registry ships it. */
+  source: string;
+}
+
 export interface ShadcnSupport {
-  /** Registry block name, e.g. `chart-radar-default`. */
+  /** The chart family on ui.shadcn.com/charts, which is also the key into the pulled blocks. */
+  family: ShadcnFamily;
+  /** The block the catalogue treats as this type's example, e.g. `chart-radar-default`. */
   block: string;
   docs: string;
 }
@@ -101,8 +115,19 @@ export function providerLabel(chart: ChartType, provider: Provider): string | un
   return mermaidTag(chart);
 }
 
-export function shadcnAddCommand(chart: ChartType): string | undefined {
-  return chart.shadcn ? `npx shadcn@latest add ${chart.shadcn.block}` : undefined;
+export function shadcnAddCommand(block: string): string {
+  return `npx shadcn@latest add ${block}`;
+}
+
+/** Every block in the type's family, the catalogue's example first. */
+export function shadcnVariants(chart: ChartType): ShadcnBlock[] {
+  if (!chart.shadcn) return [];
+  const blocks = SHADCN_BLOCKS[chart.shadcn.family];
+  return [...blocks].sort((a, b) => Number(b.name === chart.shadcn?.block) - Number(a.name === chart.shadcn?.block));
+}
+
+export function shadcnBlock(chart: ChartType): ShadcnBlock | undefined {
+  return shadcnVariants(chart).find((block) => block.name === chart.shadcn?.block);
 }
 
 export function shadcnPreviewUrl(chart: ChartType): string | undefined {
@@ -113,7 +138,7 @@ export function shadcnPreviewUrl(chart: ChartType): string | undefined {
 export function rawTemplate(chart: ChartType, provider: Provider): string | undefined {
   if (provider === "mermaid") return chart.mermaid?.template;
   if (provider === "echarts") return chart.echarts ? JSON.stringify(chart.echarts.option, null, 2) : undefined;
-  return undefined;
+  return shadcnBlock(chart)?.source;
 }
 
 const FENCE_LANGUAGE: Record<Provider, string> = { mermaid: "mermaid", echarts: "json", shadcn: "tsx" };
@@ -147,10 +172,13 @@ export function promptSnippet(chart: ChartType, provider: Provider): string {
     return lines.join("\n");
   }
   if (provider === "shadcn" && chart.shadcn) {
-    return [
-      `Return the answer as a shadcn/ui chart using the \`${chart.shadcn.block}\` block (Recharts), as a React component with the data inline.`,
-      `Install it with \`${shadcnAddCommand(chart)}\`.`,
-    ].join("\n");
+    const lines = [
+      `Return the answer as a shadcn/ui chart based on the \`${chart.shadcn.block}\` block (Recharts), as a React component with the data inline.`,
+      `It installs with \`${shadcnAddCommand(chart.shadcn.block)}\`.`,
+    ];
+    const source = rawTemplate(chart, "shadcn");
+    if (source) lines.push("Start from this component:", "", source);
+    return lines.join("\n");
   }
   return `Return the answer as a ${name} chart.`;
 }
