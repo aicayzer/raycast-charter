@@ -1,5 +1,5 @@
 import { FAMILIES } from "../data/families";
-import { groupByFamily, type ChartType } from "./catalogue";
+import { groupByFamily, type ChartType } from "./catalog";
 
 export interface ChartSection {
   id: string;
@@ -7,15 +7,15 @@ export interface ChartSection {
   charts: ChartType[];
 }
 
-export const FAVOURITES_SECTION = "favourites";
+export const FAVORITES_SECTION = "favorites";
 export const RECENT_SECTION = "recent";
 
-/** Favourites, then recent in the order they were used, then one section per family in catalogue order. */
-export function buildSections(charts: ChartType[], favourites: string[], recent: string[]): ChartSection[] {
+/** Favorites, then recent in the order they were used, then one section per family in catalog order. */
+export function buildSections(charts: ChartType[], favorites: string[], recent: string[]): ChartSection[] {
   const sections: ChartSection[] = [];
-  const favourite = charts.filter((chart) => favourites.includes(chart.id));
-  if (favourite.length > 0) {
-    sections.push({ id: FAVOURITES_SECTION, title: "Favourites", charts: favourite });
+  const favorite = charts.filter((chart) => favorites.includes(chart.id));
+  if (favorite.length > 0) {
+    sections.push({ id: FAVORITES_SECTION, title: "Favorites", charts: favorite });
   }
   const recentCharts = recent.flatMap((id) => charts.filter((chart) => chart.id === id));
   if (recentCharts.length > 0) {

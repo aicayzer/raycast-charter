@@ -8,7 +8,7 @@ export interface ChartSource {
 }
 
 /**
- * First-line keywords Mermaid accepts that the catalogue does not list under
+ * First-line keywords Mermaid accepts that the catalog does not list under
  * a type of its own: aliases, older spellings and the non-beta forms.
  */
 const EXTRA_MERMAID_KEYWORDS = [

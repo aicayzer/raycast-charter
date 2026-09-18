@@ -1,7 +1,7 @@
 import { Color, Detail } from "@raycast/api";
 import { familyInfo } from "../data/families";
 import { PROVIDERS } from "../data/providers";
-import { mermaidLabel, missingProviders, type ChartType } from "../lib/catalogue";
+import { mermaidLabel, missingProviders, type ChartType } from "../lib/catalog";
 
 /**
  * The structured half of a chart: family, one link row per provider that can

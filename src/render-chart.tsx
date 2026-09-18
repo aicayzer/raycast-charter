@@ -9,7 +9,7 @@ interface RenderContext {
   source?: string;
 }
 
-/** Launch context first, then whatever is selected, then the clipboard. Nothing recognised means the form. */
+/** Launch context first, then whatever is selected, then the clipboard. Nothing recognized means the form. */
 async function findSource(context?: RenderContext): Promise<ChartSource | undefined> {
   const fromContext = detectSource(context?.source);
   if (fromContext) return fromContext;

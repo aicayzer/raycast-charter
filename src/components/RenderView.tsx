@@ -21,7 +21,7 @@ import SourceForm from "./SourceForm";
 
 interface RenderViewProps {
   source: ChartSource;
-  /** Set when pushed from the catalogue, where the type is the natural title. At the root it stays unset. */
+  /** Set when pushed from the catalog, where the type is the natural title. At the root it stays unset. */
   title?: string;
 }
 

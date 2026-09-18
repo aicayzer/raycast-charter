@@ -1,6 +1,6 @@
 import { Icon, List } from "@raycast/api";
 import { PROVIDERS } from "../data/providers";
-import { PROVIDER_ORDER, type Lens } from "../lib/catalogue";
+import { PROVIDER_ORDER, type Lens } from "../lib/catalog";
 
 interface LensDropdownProps {
   value: Lens;

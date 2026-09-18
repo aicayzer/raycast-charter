@@ -1,5 +1,5 @@
 import { Icon } from "@raycast/api";
-import type { Family } from "../lib/catalogue";
+import type { Family } from "../lib/catalog";
 
 export interface FamilyInfo {
   id: Family;

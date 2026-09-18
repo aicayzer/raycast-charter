@@ -1,10 +1,10 @@
 import { Color } from "@raycast/api";
-import type { Provider } from "../lib/catalogue";
+import type { Provider } from "../lib/catalog";
 
 export interface ProviderInfo {
   id: Provider;
   title: string;
-  /** Tag colour in list accessories and metadata. */
+  /** Tag color in list accessories and metadata. */
   color: Color;
 }
 

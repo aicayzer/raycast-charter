@@ -1,4 +1,4 @@
-import type { ChartType } from "../lib/catalogue";
+import type { ChartType } from "../lib/catalog";
 import { ECHARTS_OPTIONS } from "./echarts-options";
 import { ECHARTS_OPTION, MERMAID_DOCS, SHADCN_CHARTS } from "./urls";
 
@@ -7,7 +7,7 @@ const shadcnDocs = (page: string) => `${SHADCN_CHARTS}/${page}`;
 const echartsDocs = (series: string) => `${ECHARTS_OPTION}-${series}`;
 
 /**
- * The catalogue. Order within a family is the order shown.
+ * The catalog. Order within a family is the order shown.
  * `since` is the Mermaid release that added the type, checked against the
  * release notes on 17 September 2026; absent means long-standing.
  */
@@ -127,7 +127,7 @@ Housing,Bills,100`,
   },
   {
     id: "eventmodeling",
-    name: "Event Modelling",
+    name: "Event Modeling",
     family: "flow",
     synonyms: ["event storming", "commands and events", "cqrs", "timeline of events"],
     use: "Commands, events and views along a system timeline.",
@@ -156,7 +156,7 @@ tf 04 rmo CartView`,
       docs: mermaidDocs("swimlanes"),
       template: `swimlane-beta LR
   subgraph Customer
-    Browse[Browse catalogue]
+    Browse[Browse catalog]
     Pay[Pay]
   end
   subgraph Warehouse
@@ -528,7 +528,7 @@ tf 04 rmo CartView`,
     synonyms: ["dial", "speedometer", "meter", "kpi"],
     use: "One value against a range, read like a dial.",
     echarts: { series: "gauge", docs: echartsDocs("gauge"), option: ECHARTS_OPTIONS.gauge },
-    notes: "shadcn's radial chart with centre text is the nearest recipe.",
+    notes: "shadcn's radial chart with center text is the nearest recipe.",
   },
   {
     id: "scatter",
@@ -543,7 +543,7 @@ tf 04 rmo CartView`,
     name: "Heatmap",
     family: "quantity",
     synonyms: ["matrix", "calendar heatmap", "density", "grid of values"],
-    use: "A grid of values coloured by magnitude.",
+    use: "A grid of values colored by magnitude.",
     echarts: { series: "heatmap", docs: echartsDocs("heatmap"), option: ECHARTS_OPTIONS.heatmap },
   },
   {
@@ -650,7 +650,7 @@ tf 04 rmo CartView`,
   todo[To do]
     t1[Write the brief]
   doing[In progress]
-    t2[Build the catalogue]
+    t2[Build the catalog]
   done[Done]
     t3[Ship the scaffold]`,
     },
@@ -673,7 +673,7 @@ tf 04 rmo CartView`,
     name: "Calendar Heatmap",
     family: "time",
     synonyms: ["contributions", "github graph", "daily activity", "year view"],
-    use: "One cell per day coloured by value, for activity and streaks.",
+    use: "One cell per day colored by value, for activity and streaks.",
     echarts: {
       series: "heatmap",
       docs: echartsDocs("heatmap"),
@@ -715,8 +715,8 @@ tf 04 rmo CartView`,
     id: "quadrant",
     name: "Quadrant",
     family: "framework",
-    synonyms: ["2x2", "matrix", "magic quadrant", "prioritisation", "effort impact"],
-    use: "Items placed on two axes, split into four labelled quadrants.",
+    synonyms: ["2x2", "matrix", "magic quadrant", "prioritization", "effort impact"],
+    use: "Items placed on two axes, split into four labeled quadrants.",
     mermaid: {
       keyword: "quadrantChart",
       since: "10.2",
@@ -826,7 +826,7 @@ evolve Kettle 0.62`,
     "Investigate root cause"
 
   complicated
-    "Analyse performance data"
+    "Analyze performance data"
 
   clear
     "Restart service"

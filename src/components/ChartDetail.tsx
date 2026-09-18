@@ -1,6 +1,6 @@
 import { Detail } from "@raycast/api";
 import { PROVIDERS } from "../data/providers";
-import { rawTemplate, shadcnAddCommand, shadcnVariants, type ChartType, type Provider } from "../lib/catalogue";
+import { rawTemplate, shadcnAddCommand, shadcnVariants, type ChartType, type Provider } from "../lib/catalog";
 import { thumbnailMarkdown } from "../lib/thumbnails";
 import ChartActions from "./ChartActions";
 import ChartMetadata from "./ChartMetadata";
@@ -8,8 +8,8 @@ import ChartMetadata from "./ChartMetadata";
 interface ChartDetailProps {
   chart: ChartType;
   provider: Provider;
-  isFavourite: boolean;
-  onToggleFavourite: (id: string) => Promise<boolean>;
+  isFavorite: boolean;
+  onToggleFavorite: (id: string) => Promise<boolean>;
   onUse: (id: string) => Promise<void>;
 }
 
@@ -47,7 +47,7 @@ export function chartMarkdown(chart: ChartType, provider: Provider): string {
   return parts.filter(Boolean).join("\n\n");
 }
 
-export default function ChartDetail({ chart, provider, isFavourite, onToggleFavourite, onUse }: ChartDetailProps) {
+export default function ChartDetail({ chart, provider, isFavorite, onToggleFavorite, onUse }: ChartDetailProps) {
   return (
     <Detail
       navigationTitle={chart.name}
@@ -57,8 +57,8 @@ export default function ChartDetail({ chart, provider, isFavourite, onToggleFavo
         <ChartActions
           chart={chart}
           provider={provider}
-          isFavourite={isFavourite}
-          onToggleFavourite={onToggleFavourite}
+          isFavorite={isFavorite}
+          onToggleFavorite={onToggleFavorite}
           onUse={onUse}
         />
       }

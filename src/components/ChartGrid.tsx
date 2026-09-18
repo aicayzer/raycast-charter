@@ -1,6 +1,6 @@
 import { Grid } from "@raycast/api";
 import type { ViewMode } from "../hooks/useViewMode";
-import { lensProvider, providerLabel, searchKeywords, type Lens } from "../lib/catalogue";
+import { lensProvider, providerLabel, searchKeywords, type Lens } from "../lib/catalog";
 import type { ChartSection } from "../lib/sections";
 import { tileContent } from "../lib/thumbnails";
 import ChartActions from "./ChartActions";
@@ -9,8 +9,8 @@ import LensDropdown from "./LensDropdown";
 export interface BrowseProps {
   sections: ChartSection[];
   isLoading: boolean;
-  isFavourite: (id: string) => boolean;
-  onToggleFavourite: (id: string) => Promise<boolean>;
+  isFavorite: (id: string) => boolean;
+  onToggleFavorite: (id: string) => Promise<boolean>;
   /** Called when a type is opened or copied from, so it joins the Recent section. */
   onUse: (id: string) => Promise<void>;
   /** Absent when there is nothing to clear. */
@@ -29,8 +29,8 @@ export default function ChartGrid(props: BrowseProps) {
   const {
     sections,
     isLoading,
-    isFavourite,
-    onToggleFavourite,
+    isFavorite,
+    onToggleFavorite,
     onUse,
     onClearRecent,
     lens,
@@ -67,8 +67,8 @@ export default function ChartGrid(props: BrowseProps) {
                   <ChartActions
                     chart={chart}
                     provider={provider}
-                    isFavourite={isFavourite(chart.id)}
-                    onToggleFavourite={onToggleFavourite}
+                    isFavorite={isFavorite(chart.id)}
+                    onToggleFavorite={onToggleFavorite}
                     onUse={onUse}
                     browse={{
                       onClearRecent,

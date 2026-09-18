@@ -17,7 +17,7 @@ const HEIGHT = 600;
 const PAD = 12;
 /** ECharts draws at half size and double density so labels read at tile size. */
 const ECHARTS_SCALE = 2;
-/** The shadcn card is fixed at this width and centred on the 3:2 stage. */
+/** The shadcn card is fixed at this width and centered on the 3:2 stage. */
 const SHADCN_CARD_WIDTH = 640;
 const PROVIDERS = ["mermaid", "shadcn", "echarts"];
 
@@ -89,7 +89,7 @@ async function renderLocal(page, source, dark, target) {
   rmSync(file, { force: true });
 }
 
-/** The real block from ui.shadcn.com, its card centred on a transparent 3:2 stage. */
+/** The real block from ui.shadcn.com, its card centered on a transparent 3:2 stage. */
 async function renderShadcn(page, block, dark, target) {
   await page.setViewport({ width: WIDTH, height: HEIGHT, deviceScaleFactor: 2 });
   await page.emulateMediaFeatures([{ name: "prefers-color-scheme", value: dark ? "dark" : "light" }]);
@@ -136,7 +136,7 @@ async function main() {
               await renderShadcn(page, chart.shadcn.block, dark, target);
             } else {
               const source = sourceFor(chart, provider);
-              if (!source) throw new Error("no option in the catalogue");
+              if (!source) throw new Error("no option in the catalog");
               await renderLocal(page, source, dark, target);
             }
           }

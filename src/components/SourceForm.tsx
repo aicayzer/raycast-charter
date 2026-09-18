@@ -22,7 +22,7 @@ export default function SourceForm({ initial = "" }: SourceFormProps) {
     if (!source) {
       setError(
         text.trim()
-          ? "Not recognised. Start with a Mermaid keyword such as flowchart, or paste an ECharts option as JSON with a series key."
+          ? "Not recognized. Start with a Mermaid keyword such as flowchart, or paste an ECharts option as JSON with a series key."
           : "Paste a Mermaid diagram or an ECharts option.",
       );
       return;

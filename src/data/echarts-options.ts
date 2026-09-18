@@ -1,7 +1,7 @@
-import type { EchartsOption } from "../lib/catalogue";
+import type { EchartsOption } from "../lib/catalog";
 
 /**
- * One complete option per catalogue type ECharts can draw. Small, static, no
+ * One complete option per catalog type ECharts can draw. Small, static, no
  * functions, so each one is a template to copy as JSON, a prompt example and
  * a thumbnail. The page sets a transparent background and turns animation off.
  */

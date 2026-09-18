@@ -1,6 +1,6 @@
 import { List } from "@raycast/api";
 import { PROVIDERS } from "../data/providers";
-import { lensProvider, mermaidTag, searchKeywords, type ChartType, type Provider } from "../lib/catalogue";
+import { lensProvider, mermaidTag, searchKeywords, type ChartType, type Provider } from "../lib/catalog";
 import { thumbnailMarkdown } from "../lib/thumbnails";
 import ChartActions from "./ChartActions";
 import { providerSection } from "./ChartDetail";
@@ -39,8 +39,8 @@ export default function ChartList(props: BrowseProps) {
   const {
     sections,
     isLoading,
-    isFavourite,
-    onToggleFavourite,
+    isFavorite,
+    onToggleFavorite,
     onUse,
     onClearRecent,
     lens,
@@ -81,8 +81,8 @@ export default function ChartList(props: BrowseProps) {
                   <ChartActions
                     chart={chart}
                     provider={provider}
-                    isFavourite={isFavourite(chart.id)}
-                    onToggleFavourite={onToggleFavourite}
+                    isFavorite={isFavorite(chart.id)}
+                    onToggleFavorite={onToggleFavorite}
                     onUse={onUse}
                     browse={{
                       onClearRecent,

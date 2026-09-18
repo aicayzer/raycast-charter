@@ -13,7 +13,7 @@ import {
   shadcnVariants,
   type ChartType,
   type Provider,
-} from "../lib/catalogue";
+} from "../lib/catalog";
 import ChartDetail from "./ChartDetail";
 import RenderView from "./RenderView";
 
@@ -28,8 +28,8 @@ export interface ChartActionsProps {
   chart: ChartType;
   /** The provider whose content the view shows and the primary actions follow. */
   provider: Provider;
-  isFavourite: boolean;
-  onToggleFavourite: (id: string) => Promise<boolean>;
+  isFavorite: boolean;
+  onToggleFavorite: (id: string) => Promise<boolean>;
   /** Called when the type is opened or copied from, so it joins the Recent section. */
   onUse: (id: string) => Promise<void>;
   /** Present in the browse views, absent on the chart page itself. */
@@ -45,7 +45,7 @@ export interface ChartActionsProps {
 }
 
 export default function ChartActions(props: ChartActionsProps) {
-  const { chart, provider, isFavourite, onToggleFavourite, onUse, browse } = props;
+  const { chart, provider, isFavorite, onToggleFavorite, onUse, browse } = props;
   const docs = docsUrl(chart, provider);
   const fenced = fencedTemplate(chart, provider);
   const raw = rawTemplate(chart, provider);
@@ -70,15 +70,15 @@ export default function ChartActions(props: ChartActionsProps) {
     }
   }
 
-  async function toggleFavourite() {
+  async function toggleFavorite() {
     try {
-      const nowFavourite = await onToggleFavourite(chart.id);
+      const nowFavorite = await onToggleFavorite(chart.id);
       await showToast({
         style: Toast.Style.Success,
-        title: nowFavourite ? "Added to Favourites" : "Removed from Favourites",
+        title: nowFavorite ? "Added to Favorites" : "Removed from Favorites",
       });
     } catch (error) {
-      await showFailureToast(error, { title: "Could not update favourites" });
+      await showFailureToast(error, { title: "Could not update favorites" });
     }
   }
 
@@ -96,8 +96,8 @@ export default function ChartActions(props: ChartActionsProps) {
               <ChartDetail
                 chart={chart}
                 provider={provider}
-                isFavourite={isFavourite}
-                onToggleFavourite={onToggleFavourite}
+                isFavorite={isFavorite}
+                onToggleFavorite={onToggleFavorite}
                 onUse={onUse}
               />
             }
@@ -214,12 +214,12 @@ export default function ChartActions(props: ChartActionsProps) {
         ))}
       </ActionPanel.Section>
 
-      <ActionPanel.Section title="Catalogue">
+      <ActionPanel.Section title="Catalog">
         <Action
-          title={isFavourite ? "Remove from Favourites" : "Add to Favourites"}
-          icon={isFavourite ? Icon.StarDisabled : Icon.Star}
+          title={isFavorite ? "Remove from Favorites" : "Add to Favorites"}
+          icon={isFavorite ? Icon.StarDisabled : Icon.Star}
           shortcut={Keyboard.Shortcut.Common.Pin}
-          onAction={toggleFavourite}
+          onAction={toggleFavorite}
         />
         {browse && (
           <Action

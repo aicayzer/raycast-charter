@@ -1,7 +1,7 @@
 import { Color, environment, Image } from "@raycast/api";
 import { THUMBNAILS } from "../data/thumbnails";
 import { familyInfo } from "../data/families";
-import type { ChartType, Provider } from "./catalogue";
+import type { ChartType, Provider } from "./catalog";
 
 const available = new Set(THUMBNAILS);
 

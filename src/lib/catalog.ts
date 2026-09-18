@@ -3,7 +3,7 @@ import { SHADCN_VIEW } from "../data/urls";
 
 export type Provider = "mermaid" | "shadcn" | "echarts";
 
-/** The search-bar dropdown: every type with Mermaid first, or one library's view of the catalogue. */
+/** The search-bar dropdown: every type with Mermaid first, or one library's view of the catalog. */
 export type Lens = "all" | Provider;
 
 export type Family = "flow" | "structure" | "hierarchy" | "quantity" | "time" | "geo" | "framework";
@@ -34,7 +34,7 @@ export interface ShadcnBlock {
 export interface ShadcnSupport {
   /** The chart family on ui.shadcn.com/charts, which is also the key into the pulled blocks. */
   family: ShadcnFamily;
-  /** The block the catalogue treats as this type's example, e.g. `chart-radar-default`. */
+  /** The block the catalog treats as this type's example, e.g. `chart-radar-default`. */
   block: string;
   docs: string;
 }
@@ -119,7 +119,7 @@ export function shadcnAddCommand(block: string): string {
   return `npx shadcn@latest add ${block}`;
 }
 
-/** Every block in the type's family, the catalogue's example first. */
+/** Every block in the type's family, the catalog's example first. */
 export function shadcnVariants(chart: ChartType): ShadcnBlock[] {
   if (!chart.shadcn) return [];
   const blocks = SHADCN_BLOCKS[chart.shadcn.family];
