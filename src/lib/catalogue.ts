@@ -33,7 +33,7 @@ export interface EchartsSupport {
   series: string;
   docs: string;
   /** A complete, small option that draws the type. */
-  option?: EchartsOption;
+  option: EchartsOption;
   /** Extra guidance for a model writing this option. */
   hint?: string;
 }
@@ -112,7 +112,7 @@ export function shadcnPreviewUrl(chart: ChartType): string | undefined {
 /** The provider's example as text: Mermaid syntax, the ECharts option as JSON, or the shadcn component. */
 export function rawTemplate(chart: ChartType, provider: Provider): string | undefined {
   if (provider === "mermaid") return chart.mermaid?.template;
-  if (provider === "echarts") return chart.echarts?.option ? JSON.stringify(chart.echarts.option, null, 2) : undefined;
+  if (provider === "echarts") return chart.echarts ? JSON.stringify(chart.echarts.option, null, 2) : undefined;
   return undefined;
 }
 

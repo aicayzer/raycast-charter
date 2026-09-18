@@ -15,6 +15,8 @@ const workDir = join(root, ".thumbnails");
 const WIDTH = 900;
 const HEIGHT = 600;
 const PAD = 12;
+/** ECharts draws at half size and double density so labels read at tile size. */
+const ECHARTS_SCALE = 2;
 /** Width at which a shadcn card lands near 3:2. */
 const SHADCN_WIDTH = 640;
 const PROVIDERS = ["mermaid", "shadcn", "echarts"];
@@ -48,17 +50,22 @@ const { CHARTS } = await loadModule(join(root, "src", "data", "charts.ts"), "cha
 const { buildPage, captureSelector } = await loadModule(join(root, "src", "lib", "render", "page.ts"), "page");
 const { SHADCN_VIEW } = await loadModule(join(root, "src", "data", "urls.ts"), "urls");
 
-const stageStyle = `
+function stageStyle(scale) {
+  const width = WIDTH / scale;
+  const height = HEIGHT / scale;
+  const pad = PAD / scale;
+  return `
   html, body { margin: 0; background: transparent; }
-  #stage { width: ${WIDTH}px; height: ${HEIGHT}px; box-sizing: border-box; padding: ${PAD}px;
+  #stage { width: ${width}px; height: ${height}px; box-sizing: border-box; padding: ${pad}px;
     display: flex; align-items: center; justify-content: center; overflow: hidden; }
   #stage svg { width: 100% !important; height: 100% !important; max-width: none !important; }
-  #chart { width: ${WIDTH - 2 * PAD}px !important; height: ${HEIGHT - 2 * PAD}px !important; }
+  #chart { width: ${width - 2 * pad}px !important; height: ${height - 2 * pad}px !important; }
 `;
+}
 
 /** The Render Chart page, restyled so the drawing fills a fixed 3:2 stage. */
-function thumbnailPage(source, dark) {
-  return buildPage(source, dark, vendorDir).replace("</head>", `<style>${stageStyle}</style></head>`);
+function thumbnailPage(source, dark, scale) {
+  return buildPage(source, dark, vendorDir).replace("</head>", `<style>${stageStyle(scale)}</style></head>`);
 }
 
 async function settle(page) {
@@ -70,9 +77,10 @@ async function settle(page) {
 }
 
 async function renderLocal(page, source, dark, target) {
+  const scale = source.kind === "echarts" ? ECHARTS_SCALE : 1;
   const file = join(workDir, `${Date.now()}.html`);
-  writeFileSync(file, thumbnailPage(source, dark));
-  await page.setViewport({ width: WIDTH, height: HEIGHT, deviceScaleFactor: 1 });
+  writeFileSync(file, thumbnailPage(source, dark, scale));
+  await page.setViewport({ width: WIDTH / scale, height: HEIGHT / scale, deviceScaleFactor: scale });
   await page.emulateMediaFeatures([]);
   await page.goto(pathToFileURL(file).href, { waitUntil: "load" });
   await settle(page);
