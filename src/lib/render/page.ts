@@ -3,7 +3,7 @@ import { pathToFileURL } from "node:url";
 import type { ChartSource } from "./source";
 
 /** The ECharts canvas needs a size up front; Mermaid sizes its own SVG up to this width. */
-export const CANVAS = { width: 900, height: 560 };
+const CANVAS = { width: 900, height: 560 };
 export const MAX_WIDTH = 1200;
 
 const baseStyle = `
@@ -12,6 +12,7 @@ const baseStyle = `
     font-family: -apple-system, "Helvetica Neue", Helvetica, Arial, sans-serif; }
 `;
 
+/** `text` is the diagram already JSON-encoded, so it drops straight into the script. */
 function mermaidPage(text: string, dark: boolean, script: string): string {
   const config = JSON.stringify({
     startOnLoad: false,
@@ -27,7 +28,7 @@ function mermaidPage(text: string, dark: boolean, script: string): string {
 <script>
   window.status = "pending";
   mermaid.initialize(${config});
-  mermaid.render("chart", ${JSON.stringify(text)}).then(({ svg }) => {
+  mermaid.render("chart", ${text}).then(({ svg }) => {
     document.getElementById("stage").innerHTML = svg;
     window.status = "done";
   }).catch((error) => { window.status = "error: " + (error && error.message ? error.message : String(error)); });
@@ -54,11 +55,16 @@ function echartsPage(text: string, dark: boolean, script: string, maps: string):
 </script></body></html>`;
 }
 
+/** A closing tag inside the source would end the inline script; JSON accepts the escaped slash. */
+function inlineSafe(json: string): string {
+  return json.replace(/<\//g, "<\\/");
+}
+
 /** The page the browser loads: the vendored library plus the source, signalling through window.status. */
 export function buildPage(source: ChartSource, dark: boolean, vendorDir: string): string {
   const script = pathToFileURL(join(vendorDir, `${source.kind}.min.js`)).href;
-  if (source.kind === "mermaid") return mermaidPage(source.text, dark, script);
-  return echartsPage(source.text, dark, script, pathToFileURL(join(vendorDir, "maps.js")).href);
+  if (source.kind === "mermaid") return mermaidPage(inlineSafe(JSON.stringify(source.text)), dark, script);
+  return echartsPage(inlineSafe(source.text), dark, script, pathToFileURL(join(vendorDir, "maps.js")).href);
 }
 
 /** The element to capture: Mermaid's SVG at its natural size, or the ECharts canvas. */

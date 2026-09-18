@@ -19,7 +19,7 @@ A catalog of chart and diagram types for Raycast. Browse by family, pick the lib
 - **Render Template** draws the type's Mermaid or ECharts example in Raycast; under the shadcn lens, **Open Preview** opens the block on ui.shadcn.com instead.
 - **Copy Docs Link**, **Copy Template** and **Copy Prompt Snippet** put the link, the example, or a ready-to-paste instruction for a model on the clipboard, for the current lens. The template comes inside a fence (```mermaid, ```json or ```tsx) so it drops straight into a chat or a note; **Copy Raw Template** gives the bare text.
 - **Copy Install Command** copies `npx shadcn@latest add <block>`; **Copy Variant Install Command** and **Copy Variant Component** offer every block in the family.
-- Under **Libraries**, the other libraries' docs and examples stay one action away whatever the lens.
+- Under **Libraries**, the other libraries' docs, examples and renders stay one action away whatever the lens.
 - **Add to Favorites** pins a type to the top of the catalog, and **Clear Recent** empties the Recent section.
 
 ## Drawing
@@ -29,3 +29,7 @@ Charts are drawn by a Chromium-based browser installed on your Mac (Google Chrom
 ## Development
 
 `npm run dev` serves the extension; `npm run lint` and `npm run build` must pass before a commit. Three scripts refresh the content that ships with the extension: `npm run vendor` copies Mermaid, ECharts and the world map into `assets/vendor` from `node_modules`; `npm run shadcn` pulls the chart blocks and their source from ui.shadcn.com into `src/data/shadcn.ts`; `npm run thumbnails` redraws every thumbnail in `assets/charts` (Mermaid and ECharts locally, shadcn from the previews on ui.shadcn.com). Only the last two need the network.
+
+## Licenses
+
+Charter is MIT. It ships copies of [Mermaid](https://github.com/mermaid-js/mermaid) (MIT) and [Apache ECharts](https://github.com/apache/echarts) (Apache 2.0) for drawing, the chart block sources from [shadcn/ui](https://github.com/shadcn-ui/ui) (MIT) as examples, and country outlines from [world-atlas](https://github.com/topojson/world-atlas) (ISC, derived from Natural Earth, public domain).

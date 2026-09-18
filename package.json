@@ -2,7 +2,7 @@
   "$schema": "https://www.raycast.com/schemas/extension.json",
   "name": "charter",
   "title": "Charter",
-  "description": "A catalog of chart and diagram types showing what Mermaid, shadcn and ECharts can draw, with each library's example, docs and prompt snippet a keystroke away, and a renderer that draws Mermaid and ECharts on your machine",
+  "description": "Browse chart and diagram types with Mermaid, shadcn and ECharts examples, docs and prompt snippets, and draw Mermaid and ECharts on your Mac",
   "icon": "charter.png",
   "author": "aic",
   "platforms": [
@@ -11,6 +11,15 @@
   "categories": [
     "Developer Tools",
     "Documentation"
+  ],
+  "keywords": [
+    "chart",
+    "diagram",
+    "mermaid",
+    "echarts",
+    "shadcn",
+    "recharts",
+    "visualization"
   ],
   "license": "MIT",
   "commands": [

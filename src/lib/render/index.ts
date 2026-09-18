@@ -5,7 +5,7 @@ import { DEFAULT_KROKI_URL, renderWithKroki } from "./kroki";
 import type { RenderedImage } from "./render";
 import type { ChartSource } from "./source";
 
-export type RenderOutcome = { status: "ok"; image: RenderedImage } | { status: "no-browser" };
+type RenderOutcome = { status: "ok"; image: RenderedImage } | { status: "no-browser" };
 
 const vendorDir = join(environment.assetsPath, "vendor");
 const workDir = join(environment.supportPath, "renders");

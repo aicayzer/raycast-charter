@@ -7,8 +7,8 @@ export interface ChartSection {
   charts: ChartType[];
 }
 
-export const FAVORITES_SECTION = "favorites";
-export const RECENT_SECTION = "recent";
+const FAVORITES_SECTION = "favorites";
+const RECENT_SECTION = "recent";
 
 /** Favorites, then recent in the order they were used, then one section per family in catalog order. */
 export function buildSections(charts: ChartType[], favorites: string[], recent: string[]): ChartSection[] {

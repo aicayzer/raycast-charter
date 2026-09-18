@@ -126,7 +126,7 @@ export function shadcnVariants(chart: ChartType): ShadcnBlock[] {
   return [...blocks].sort((a, b) => Number(b.name === chart.shadcn?.block) - Number(a.name === chart.shadcn?.block));
 }
 
-export function shadcnBlock(chart: ChartType): ShadcnBlock | undefined {
+function shadcnBlock(chart: ChartType): ShadcnBlock | undefined {
   return shadcnVariants(chart).find((block) => block.name === chart.shadcn?.block);
 }
 
@@ -134,10 +134,29 @@ export function shadcnPreviewUrl(chart: ChartType): string | undefined {
   return chart.shadcn ? `${SHADCN_VIEW}/${chart.shadcn.block}` : undefined;
 }
 
+/** JSON with two-space indents, but arrays of plain values on one line, so data rows stay rows. */
+export function formatOption(value: unknown, indent = ""): string {
+  const inner = indent + "  ";
+  if (Array.isArray(value)) {
+    if (value.length === 0) return "[]";
+    if (value.every((item) => item === null || typeof item !== "object")) {
+      return `[${value.map((item) => JSON.stringify(item)).join(", ")}]`;
+    }
+    return `[\n${value.map((item) => inner + formatOption(item, inner)).join(",\n")}\n${indent}]`;
+  }
+  if (value !== null && typeof value === "object") {
+    const entries = Object.entries(value as Record<string, unknown>);
+    if (entries.length === 0) return "{}";
+    const lines = entries.map(([key, item]) => `${inner}${JSON.stringify(key)}: ${formatOption(item, inner)}`);
+    return `{\n${lines.join(",\n")}\n${indent}}`;
+  }
+  return JSON.stringify(value);
+}
+
 /** The provider's example as text: Mermaid syntax, the ECharts option as JSON, or the shadcn component. */
 export function rawTemplate(chart: ChartType, provider: Provider): string | undefined {
   if (provider === "mermaid") return chart.mermaid?.template;
-  if (provider === "echarts") return chart.echarts ? JSON.stringify(chart.echarts.option, null, 2) : undefined;
+  if (provider === "echarts") return chart.echarts ? formatOption(chart.echarts.option) : undefined;
   return shadcnBlock(chart)?.source;
 }
 

@@ -1,5 +1,6 @@
 import { Action, ActionPanel, Icon, Keyboard, showToast, Toast } from "@raycast/api";
 import { showFailureToast } from "@raycast/utils";
+import { useEffect, useState } from "react";
 import { PROVIDERS } from "../data/providers";
 import { MAX_COLUMNS, MIN_COLUMNS, type ViewMode } from "../hooks/useViewMode";
 import {
@@ -54,7 +55,10 @@ export default function ChartActions(props: ChartActionsProps) {
   const variants = shadcnVariants(chart);
   // With the list panel open the page would repeat what is already on screen, so Enter goes to the docs.
   const docsFirst = !browse || (browse.viewMode === "list" && browse.showDetail);
-  const others = PROVIDER_ORDER.filter((other) => other !== provider && rawTemplate(chart, other));
+  const others = PROVIDER_ORDER.filter((other) => other !== provider && chart[other]);
+  // The chart page is pushed with a snapshot of the flag, so the title follows a local copy.
+  const [favorite, setFavorite] = useState(isFavorite);
+  useEffect(() => setFavorite(isFavorite), [isFavorite]);
 
   // Recording a use is bookkeeping; a storage failure must not stop the copy or open it follows.
   function used() {
@@ -73,6 +77,7 @@ export default function ChartActions(props: ChartActionsProps) {
   async function toggleFavorite() {
     try {
       const nowFavorite = await onToggleFavorite(chart.id);
+      setFavorite(nowFavorite);
       await showToast({
         style: Toast.Style.Success,
         title: nowFavorite ? "Added to Favorites" : "Removed from Favorites",
@@ -83,6 +88,41 @@ export default function ChartActions(props: ChartActionsProps) {
   }
 
   const openDocs = docs && <Action.OpenInBrowser title="Open Docs" url={docs} onOpen={used} />;
+
+  const shadcnCopies = addCommand && (
+    <>
+      <Action.CopyToClipboard
+        title="Copy Install Command"
+        content={addCommand}
+        shortcut={shortcut("i", "shift")}
+        onCopy={used}
+      />
+      {variants.length > 1 && (
+        <ActionPanel.Submenu title="Copy Variant Install Command…" icon={Icon.Terminal}>
+          {variants.map((block) => (
+            <Action.CopyToClipboard
+              key={block.name}
+              title={block.title}
+              content={shadcnAddCommand(block.name)}
+              onCopy={used}
+            />
+          ))}
+        </ActionPanel.Submenu>
+      )}
+      {variants.length > 1 && (
+        <ActionPanel.Submenu title="Copy Variant Component…" icon={Icon.Code}>
+          {variants.map((block) => (
+            <Action.CopyToClipboard
+              key={block.name}
+              title={block.title}
+              content={"```tsx\n" + block.source + "\n```"}
+              onCopy={used}
+            />
+          ))}
+        </ActionPanel.Submenu>
+      )}
+    </>
+  );
 
   return (
     <ActionPanel title={chart.name}>
@@ -96,7 +136,7 @@ export default function ChartActions(props: ChartActionsProps) {
               <ChartDetail
                 chart={chart}
                 provider={provider}
-                isFavorite={isFavorite}
+                isFavorite={favorite}
                 onToggleFavorite={onToggleFavorite}
                 onUse={onUse}
               />
@@ -156,68 +196,44 @@ export default function ChartActions(props: ChartActionsProps) {
           shortcut={shortcut("p", "shift")}
           onCopy={used}
         />
-        {addCommand && (
-          <Action.CopyToClipboard
-            title="Copy Install Command"
-            content={addCommand}
-            shortcut={shortcut("i", "shift")}
-            onCopy={used}
-          />
-        )}
-        {variants.length > 1 && (
-          <ActionPanel.Submenu title="Copy Variant Install Command" icon={Icon.Terminal}>
-            {variants.map((block) => (
-              <Action.CopyToClipboard
-                key={block.name}
-                title={block.title}
-                content={shadcnAddCommand(block.name)}
-                onCopy={used}
-              />
-            ))}
-          </ActionPanel.Submenu>
-        )}
-        {variants.length > 1 && (
-          <ActionPanel.Submenu title="Copy Variant Component" icon={Icon.Code}>
-            {variants.map((block) => (
-              <Action.CopyToClipboard
-                key={block.name}
-                title={block.title}
-                content={"```tsx\n" + block.source + "\n```"}
-                onCopy={used}
-              />
-            ))}
-          </ActionPanel.Submenu>
-        )}
+        {provider === "shadcn" && shadcnCopies}
       </ActionPanel.Section>
 
       <ActionPanel.Section title="Libraries">
-        {chart.mermaid && (
-          <Action.OpenInBrowser title={`Open ${PROVIDERS.mermaid.title} Docs`} url={chart.mermaid.docs} onOpen={used} />
-        )}
-        {chart.shadcn && (
+        {others.map((other) => (
           <Action.OpenInBrowser
-            title={`Open ${PROVIDERS.shadcn.title} Example`}
-            url={chart.shadcn.docs}
+            key={`docs-${other}`}
+            title={`Open ${PROVIDERS[other].title} ${other === "shadcn" ? "Example" : "Docs"}`}
+            url={docsUrl(chart, other) ?? ""}
             onOpen={used}
           />
-        )}
-        {chart.echarts && (
-          <Action.OpenInBrowser title={`Open ${PROVIDERS.echarts.title} Docs`} url={chart.echarts.docs} onOpen={used} />
-        )}
+        ))}
         {others.map((other) => (
           <Action.CopyToClipboard
-            key={other}
+            key={`copy-${other}`}
             title={`Copy ${PROVIDERS[other].title} ${TEMPLATE_NOUN[other]}`}
             content={fencedTemplate(chart, other) ?? ""}
             onCopy={used}
           />
         ))}
+        {others
+          .filter((other) => other !== "shadcn")
+          .map((other) => (
+            <Action.Push
+              key={`render-${other}`}
+              title={`Render ${PROVIDERS[other].title} ${TEMPLATE_NOUN[other]}`}
+              icon={Icon.Image}
+              target={<RenderView source={{ kind: other, text: rawTemplate(chart, other) ?? "" }} title={chart.name} />}
+              onPush={used}
+            />
+          ))}
+        {provider !== "shadcn" && shadcnCopies}
       </ActionPanel.Section>
 
       <ActionPanel.Section title="Catalog">
         <Action
-          title={isFavorite ? "Remove from Favorites" : "Add to Favorites"}
-          icon={isFavorite ? Icon.StarDisabled : Icon.Star}
+          title={favorite ? "Remove from Favorites" : "Add to Favorites"}
+          icon={favorite ? Icon.StarDisabled : Icon.Star}
           shortcut={Keyboard.Shortcut.Common.Pin}
           onAction={toggleFavorite}
         />

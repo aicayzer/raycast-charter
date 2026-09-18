@@ -43,7 +43,7 @@ const MERMAID_KEYWORDS = new Set(
 );
 
 /** Drops a surrounding ``` fence, with or without a language tag, so text copied from a chat renders as is. */
-export function stripFence(text: string): string {
+function stripFence(text: string): string {
   const match = text.trim().match(/^```[^\n]*\n([\s\S]*?)\n?```$/);
   return (match ? match[1] : text).trim();
 }

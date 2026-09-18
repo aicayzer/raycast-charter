@@ -5,7 +5,7 @@ import type { EchartsOption } from "../lib/catalog";
  * functions, so each one is a template to copy as JSON, a prompt example and
  * a thumbnail. The page sets a transparent background and turns animation off.
  */
-export const ECHARTS_OPTIONS: Record<string, EchartsOption> = {
+export const ECHARTS_OPTIONS = {
   sankey: {
     series: [
       {
@@ -572,4 +572,4 @@ export const ECHARTS_OPTIONS: Record<string, EchartsOption> = {
       },
     ],
   },
-};
+} satisfies Record<string, EchartsOption>;

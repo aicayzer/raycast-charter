@@ -30,9 +30,11 @@ function accessories(chart: ChartType, compact: boolean): List.Item.Accessory[] 
 
 /** The panel is short, so the thumbnail is fixed at a size that leaves room for the metadata. */
 const PANEL_THUMBNAIL = { width: 240, height: 160 };
+const PANEL_LINES = 30;
 
 function panelMarkdown(chart: ChartType, provider: Provider): string {
-  return `${thumbnailMarkdown(chart, provider, PANEL_THUMBNAIL)}${chart.use}\n\n${providerSection(chart, provider)}`;
+  const section = providerSection(chart, provider, PANEL_LINES);
+  return `${thumbnailMarkdown(chart, provider, PANEL_THUMBNAIL)}${chart.use}\n\n${section}`;
 }
 
 export default function ChartList(props: BrowseProps) {

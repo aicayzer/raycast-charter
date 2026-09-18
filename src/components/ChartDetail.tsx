@@ -13,14 +13,24 @@ interface ChartDetailProps {
   onUse: (id: string) => Promise<void>;
 }
 
-/**
- * One provider's part of the page: its example in a plain fence (Raycast draws
- * ```mermaid blocks itself, which would show a second picture) and its guidance.
- */
-export function providerSection(chart: ChartType, provider: Provider): string {
+/** Mermaid gets a plain fence: Raycast draws ```mermaid blocks itself, which would show a second picture. */
+const FENCE: Record<Provider, string> = { mermaid: "", echarts: "json", shadcn: "tsx" };
+
+/** Long examples are cut in the list panel; the chart page shows the whole thing. */
+function fence(text: string, language: string, maxLines?: number): string {
+  const lines = text.split("\n");
+  if (maxLines && lines.length > maxLines) {
+    const shown = lines.slice(0, maxLines).join("\n");
+    return "```" + language + "\n" + shown + "\n```\n\n" + `${lines.length - maxLines} more lines on the chart page.`;
+  }
+  return "```" + language + "\n" + text + "\n```";
+}
+
+/** One provider's part of the page: its example in a fence and its guidance. */
+export function providerSection(chart: ChartType, provider: Provider, maxLines?: number): string {
   const parts = [`## ${PROVIDERS[provider].title}`];
   const template = rawTemplate(chart, provider);
-  if (template) parts.push("```\n" + template + "\n```");
+  if (template) parts.push(fence(template, FENCE[provider], maxLines));
   if (provider === "mermaid" && chart.mermaid?.hint) parts.push(chart.mermaid.hint);
   if (provider === "echarts" && chart.echarts?.hint) parts.push(chart.echarts.hint);
   if (provider === "shadcn" && chart.shadcn) {
@@ -36,7 +46,7 @@ export function providerSection(chart: ChartType, provider: Provider): string {
   return parts.join("\n\n");
 }
 
-export function chartMarkdown(chart: ChartType, provider: Provider): string {
+function chartMarkdown(chart: ChartType, provider: Provider): string {
   const parts = [
     `# ${chart.name}`,
     chart.use,

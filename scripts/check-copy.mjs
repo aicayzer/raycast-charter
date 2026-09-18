@@ -7,6 +7,8 @@ import { fileURLToPath } from "node:url";
 
 const root = fileURLToPath(new URL("..", import.meta.url));
 const targets = ["src", "package.json", "README.md", "CHANGELOG.md"];
+/** Third-party text pulled by a script; its spelling is not ours to fix. */
+const skipped = new Set(["src/data/shadcn.ts"]);
 
 const rules = [
   { name: "em or en dash", pattern: /[–—]/ },
@@ -30,6 +32,7 @@ function* walk(path) {
 const offenders = [];
 for (const target of targets) {
   for (const file of walk(join(root, target))) {
+    if (skipped.has(relative(root, file))) continue;
     const lines = readFileSync(file, "utf8").split("\n");
     lines.forEach((line, index) => {
       for (const rule of rules) {
