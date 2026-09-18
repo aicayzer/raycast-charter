@@ -1,5 +1,5 @@
 import { Color } from "@raycast/api";
-import type { Provider } from "../lib/catalog";
+import { PROVIDER_TITLES, type Provider } from "../lib/catalog";
 
 export interface ProviderInfo {
   id: Provider;
@@ -11,17 +11,17 @@ export interface ProviderInfo {
 export const PROVIDERS: Record<Provider, ProviderInfo> = {
   mermaid: {
     id: "mermaid",
-    title: "Mermaid",
+    title: PROVIDER_TITLES.mermaid,
     color: Color.Magenta,
   },
   shadcn: {
     id: "shadcn",
-    title: "shadcn",
+    title: PROVIDER_TITLES.shadcn,
     color: Color.SecondaryText,
   },
   echarts: {
     id: "echarts",
-    title: "ECharts",
+    title: PROVIDER_TITLES.echarts,
     color: Color.Red,
   },
 };

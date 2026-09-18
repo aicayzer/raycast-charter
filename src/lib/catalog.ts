@@ -67,6 +67,9 @@ export interface ChartType {
 
 export const PROVIDER_ORDER: Provider[] = ["mermaid", "shadcn", "echarts"];
 
+/** Display names; shadcn is lowercase by its own convention. */
+export const PROVIDER_TITLES: Record<Provider, string> = { mermaid: "Mermaid", shadcn: "shadcn", echarts: "ECharts" };
+
 export function matchesLens(chart: ChartType, lens: Lens): boolean {
   return lens === "all" || Boolean(chart[lens]);
 }
@@ -108,11 +111,19 @@ export function mermaidLabel(chart: ChartType): string | undefined {
   return chart.mermaid.since ? `${chart.mermaid.keyword}, ${chart.mermaid.since}+` : chart.mermaid.keyword;
 }
 
-/** What the tile says under the name for one provider: the Mermaid tag, the block, or the series. */
-export function providerLabel(chart: ChartType, provider: Provider): string | undefined {
-  if (provider === "shadcn") return chart.shadcn?.block;
-  if (provider === "echarts") return chart.echarts?.series;
-  return mermaidTag(chart);
+/**
+ * What the tile says under the name. Under All the question is which libraries
+ * draw it; under the Mermaid lens the version still matters; under the others
+ * the picture and the name say it all.
+ */
+export function tileSubtitle(chart: ChartType, lens: Lens): string | undefined {
+  if (lens === "all") {
+    return PROVIDER_ORDER.filter((provider) => chart[provider])
+      .map((provider) => PROVIDER_TITLES[provider])
+      .join(", ");
+  }
+  if (lens === "mermaid" && chart.mermaid?.since) return mermaidTag(chart);
+  return undefined;
 }
 
 export function shadcnAddCommand(block: string): string {

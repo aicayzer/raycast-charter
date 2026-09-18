@@ -2,6 +2,12 @@
 
 A catalog of chart and diagram types for Raycast. Browse by family, pick the library you are working in, and copy the docs link, a complete example or a prompt snippet for it without leaving the keyboard. Charter also draws Mermaid diagrams and ECharts options on your machine.
 
+![Browse Charts as a grid](metadata/charter-1.png)
+
+![Browse Charts as a list with the detail panel](metadata/charter-2.png)
+
+![Render Chart showing a Venn diagram](metadata/charter-3.png)
+
 ## Commands
 
 - **Browse Charts** lists every type, grouped by family, with your favorites and the five types you last opened or copied from at the top. The dropdown in the search bar is the lens: **All** shows every type with Mermaid first, and **Mermaid**, **shadcn** or **ECharts** narrows the catalog to what that library can draw and shows that library's picture, example and docs on every type. `cmd+shift+l` switches between a grid of thumbnails and a list with a detail panel; `cmd+=` and `cmd+-` change the tile size. Search matches names and synonyms, so "spider" finds Radar and "flow of money" finds Sankey.

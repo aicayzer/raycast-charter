@@ -1,6 +1,6 @@
 import { Grid } from "@raycast/api";
 import type { ViewMode } from "../hooks/useViewMode";
-import { lensProvider, providerLabel, searchKeywords, type Lens } from "../lib/catalog";
+import { lensProvider, searchKeywords, tileSubtitle, type Lens } from "../lib/catalog";
 import type { ChartSection } from "../lib/sections";
 import { tileContent } from "../lib/thumbnails";
 import ChartActions from "./ChartActions";
@@ -61,7 +61,7 @@ export default function ChartGrid(props: BrowseProps) {
                 key={`${section.id}-${chart.id}`}
                 content={tileContent(chart, provider)}
                 title={chart.name}
-                subtitle={providerLabel(chart, provider)}
+                subtitle={tileSubtitle(chart, lens)}
                 keywords={searchKeywords(chart)}
                 actions={
                   <ChartActions
