@@ -333,7 +333,7 @@ tf 04 rmo CartView`,
     echarts: {
       series: "tree",
       docs: echartsDocs("tree"),
-      note: "ECharts draws a tree layout; set layout to radial for the closest match to a mindmap.",
+      hint: "ECharts draws a tree layout; set layout to radial for the closest match to a mindmap.",
     },
   },
   {
@@ -456,7 +456,7 @@ tf 04 rmo CartView`,
     echarts: {
       series: "line",
       docs: echartsDocs("line"),
-      note: "An area chart in ECharts is a line series with areaStyle set.",
+      hint: "An area chart in ECharts is a line series with areaStyle set.",
     },
   },
   {
@@ -491,7 +491,7 @@ tf 04 rmo CartView`,
     echarts: {
       series: "bar",
       docs: echartsDocs("bar"),
-      note: "A bar series on a polar coordinate system.",
+      hint: "A bar series on a polar coordinate system.",
     },
   },
   {
@@ -629,7 +629,7 @@ tf 04 rmo CartView`,
     echarts: {
       series: "scatter",
       docs: echartsDocs("scatter"),
-      note: "A scatter series with markLine at the axis midpoints.",
+      hint: "A scatter series with markLine at the axis midpoints.",
     },
   },
   {

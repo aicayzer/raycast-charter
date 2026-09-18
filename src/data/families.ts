@@ -15,6 +15,7 @@ export const FAMILIES: FamilyInfo[] = [
   { id: "hierarchy", title: "Hierarchy and Part to Whole", icon: Icon.PieChart },
   { id: "quantity", title: "Quantity", icon: Icon.BarChart },
   { id: "time", title: "Time and Planning", icon: Icon.Calendar },
+  { id: "geo", title: "Maps", icon: Icon.Globe },
   { id: "framework", title: "Frameworks", icon: Icon.Layers },
 ];
 

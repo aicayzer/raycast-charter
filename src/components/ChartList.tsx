@@ -1,11 +1,12 @@
 import { List } from "@raycast/api";
 import { PROVIDERS } from "../data/providers";
-import { mermaidTag, searchKeywords, type ChartType } from "../lib/catalogue";
+import { lensProvider, mermaidTag, searchKeywords, type ChartType, type Provider } from "../lib/catalogue";
 import { thumbnailMarkdown } from "../lib/thumbnails";
 import ChartActions from "./ChartActions";
+import { providerSection } from "./ChartDetail";
 import type { BrowseProps } from "./ChartGrid";
 import ChartMetadata from "./ChartMetadata";
-import ProviderDropdown from "./ProviderDropdown";
+import LensDropdown from "./LensDropdown";
 
 function accessories(chart: ChartType, compact: boolean): List.Item.Accessory[] {
   const items: List.Item.Accessory[] = [];
@@ -30,8 +31,8 @@ function accessories(chart: ChartType, compact: boolean): List.Item.Accessory[] 
 /** The panel is short, so the thumbnail is fixed at a size that leaves room for the metadata. */
 const PANEL_THUMBNAIL = { width: 240, height: 160 };
 
-function panelMarkdown(chart: ChartType): string {
-  return `${thumbnailMarkdown(chart, PANEL_THUMBNAIL)}${chart.use}`;
+function panelMarkdown(chart: ChartType, provider: Provider): string {
+  return `${thumbnailMarkdown(chart, provider, PANEL_THUMBNAIL)}${chart.use}\n\n${providerSection(chart, provider)}`;
 }
 
 export default function ChartList(props: BrowseProps) {
@@ -42,8 +43,8 @@ export default function ChartList(props: BrowseProps) {
     onToggleFavourite,
     onUse,
     onClearRecent,
-    filter,
-    onFilterChange,
+    lens,
+    onLensChange,
     viewMode,
     onViewModeChange,
     showDetail,
@@ -57,37 +58,46 @@ export default function ChartList(props: BrowseProps) {
       isLoading={isLoading}
       isShowingDetail={showDetail}
       searchBarPlaceholder="Search chart types"
-      searchBarAccessory={<ProviderDropdown value={filter} onChange={onFilterChange} />}
+      searchBarAccessory={<LensDropdown value={lens} onChange={onLensChange} />}
     >
       {sections.map((section) => (
         <List.Section key={section.id} title={section.title}>
-          {section.charts.map((chart) => (
-            <List.Item
-              key={`${section.id}-${chart.id}`}
-              title={chart.name}
-              subtitle={showDetail ? undefined : chart.use}
-              keywords={searchKeywords(chart)}
-              accessories={accessories(chart, showDetail)}
-              detail={<List.Item.Detail markdown={panelMarkdown(chart)} metadata={<ChartMetadata chart={chart} />} />}
-              actions={
-                <ChartActions
-                  chart={chart}
-                  isFavourite={isFavourite(chart.id)}
-                  onToggleFavourite={onToggleFavourite}
-                  onUse={onUse}
-                  browse={{
-                    onClearRecent,
-                    viewMode,
-                    onSwitchView: () => onViewModeChange("grid"),
-                    showDetail,
-                    onToggleDetail,
-                    columns,
-                    onColumnsChange,
-                  }}
-                />
-              }
-            />
-          ))}
+          {section.charts.map((chart) => {
+            const provider = lensProvider(chart, lens);
+            return (
+              <List.Item
+                key={`${section.id}-${chart.id}`}
+                title={chart.name}
+                subtitle={showDetail ? undefined : chart.use}
+                keywords={searchKeywords(chart)}
+                accessories={accessories(chart, showDetail)}
+                detail={
+                  <List.Item.Detail
+                    markdown={panelMarkdown(chart, provider)}
+                    metadata={<ChartMetadata chart={chart} />}
+                  />
+                }
+                actions={
+                  <ChartActions
+                    chart={chart}
+                    provider={provider}
+                    isFavourite={isFavourite(chart.id)}
+                    onToggleFavourite={onToggleFavourite}
+                    onUse={onUse}
+                    browse={{
+                      onClearRecent,
+                      viewMode,
+                      onSwitchView: () => onViewModeChange("grid"),
+                      showDetail,
+                      onToggleDetail,
+                      columns,
+                      onColumnsChange,
+                    }}
+                  />
+                }
+              />
+            );
+          })}
         </List.Section>
       ))}
     </List>

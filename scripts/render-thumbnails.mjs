@@ -1,13 +1,13 @@
-// Renders one thumbnail per chart type, light and dark, into assets/charts/.
-// Mermaid types use the Mermaid template; the rest use a small ECharts option.
-// Both are drawn by the local Chrome through puppeteer-core from a local HTML
-// page, so nothing leaves the machine. Run by hand: npm run thumbnails [id ...].
+// Renders one thumbnail per chart type per library, light and dark, into
+// assets/charts/<id>-<provider>.png. Mermaid and ECharts are drawn by the local
+// Chrome through puppeteer-core from a local page, nothing leaves the machine.
+// shadcn thumbnails are screenshots of the block previews on ui.shadcn.com, the
+// one step that needs the network. Run by hand: npm run thumbnails [id|provider ...].
 import { build } from "esbuild";
 import { existsSync, mkdirSync, readdirSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import puppeteer from "puppeteer-core";
-import { ECHARTS_SAMPLES } from "./thumbnail-samples.mjs";
 
 const root = fileURLToPath(new URL("..", import.meta.url));
 const outDir = join(root, "assets", "charts");
@@ -15,6 +15,9 @@ const workDir = join(root, ".thumbnails");
 const WIDTH = 900;
 const HEIGHT = 600;
 const PAD = 12;
+/** Width at which a shadcn card lands near 3:2. */
+const SHADCN_WIDTH = 640;
+const PROVIDERS = ["mermaid", "shadcn", "echarts"];
 
 const CHROME_CANDIDATES = [
   process.env.CHROME_BIN,
@@ -28,129 +31,124 @@ if (!chrome) {
   process.exit(1);
 }
 
-const only = new Set(process.argv.slice(2));
+const args = process.argv.slice(2);
+const onlyProviders = new Set(args.filter((arg) => PROVIDERS.includes(arg)));
+const onlyIds = new Set(args.filter((arg) => !PROVIDERS.includes(arg)));
 
-async function loadCatalogue() {
+async function loadModule(entry, name) {
   mkdirSync(workDir, { recursive: true });
-  const bundle = join(workDir, "charts.mjs");
-  await build({
-    entryPoints: [join(root, "src", "data", "charts.ts")],
-    bundle: true,
-    format: "esm",
-    platform: "node",
-    outfile: bundle,
-    logLevel: "silent",
-  });
-  const { CHARTS } = await import(pathToFileURL(bundle).href + `?t=${Date.now()}`);
-  return CHARTS;
+  const bundle = join(workDir, `${name}.mjs`);
+  await build({ entryPoints: [entry], bundle: true, format: "esm", platform: "node", outfile: bundle, logLevel: "silent" });
+  return import(pathToFileURL(bundle).href + `?t=${Date.now()}`);
 }
 
 // The same copies the Render Chart command ships, so thumbnails match what it draws.
-const mermaidScript = pathToFileURL(join(root, "assets", "vendor", "mermaid.min.js")).href;
-const echartsScript = pathToFileURL(join(root, "assets", "vendor", "echarts.min.js")).href;
+const vendorDir = join(root, "assets", "vendor");
+const { CHARTS } = await loadModule(join(root, "src", "data", "charts.ts"), "charts");
+const { buildPage, captureSelector } = await loadModule(join(root, "src", "lib", "render", "page.ts"), "page");
+const { SHADCN_VIEW } = await loadModule(join(root, "src", "data", "urls.ts"), "urls");
 
 const stageStyle = `
   html, body { margin: 0; background: transparent; }
   #stage { width: ${WIDTH}px; height: ${HEIGHT}px; box-sizing: border-box; padding: ${PAD}px;
-    display: flex; align-items: center; justify-content: center; overflow: hidden;
-    font-family: -apple-system, "Helvetica Neue", Helvetica, Arial, sans-serif; }
+    display: flex; align-items: center; justify-content: center; overflow: hidden; }
   #stage svg { width: 100% !important; height: 100% !important; max-width: none !important; }
+  #chart { width: ${WIDTH - 2 * PAD}px !important; height: ${HEIGHT - 2 * PAD}px !important; }
 `;
 
-function mermaidPage(template, dark) {
-  const config = JSON.stringify({
-    startOnLoad: false,
-    theme: dark ? "dark" : "default",
-    securityLevel: "loose",
-    fontFamily: "-apple-system, Helvetica Neue, Helvetica, Arial, sans-serif",
-  });
-  return `<!doctype html><html><head><meta charset="utf-8"><style>${stageStyle}</style></head>
-<body><div id="stage"></div>
-<script src="${mermaidScript}"></script>
-<script>
-  window.status = "pending";
-  mermaid.initialize(${config});
-  mermaid.render("thumb", ${JSON.stringify(template)}).then(({ svg }) => {
-    document.getElementById("stage").innerHTML = svg;
-    window.status = "done";
-  }).catch((error) => { window.status = "error: " + error.message; });
-</script></body></html>`;
+/** The Render Chart page, restyled so the drawing fills a fixed 3:2 stage. */
+function thumbnailPage(source, dark) {
+  return buildPage(source, dark, vendorDir).replace("</head>", `<style>${stageStyle}</style></head>`);
 }
 
-function echartsPage(option, dark) {
-  const themed = { backgroundColor: "transparent", animation: false, ...option };
-  return `<!doctype html><html><head><meta charset="utf-8"><style>${stageStyle}
-  #chart { width: ${WIDTH - 2 * PAD}px; height: ${HEIGHT - 2 * PAD}px; }</style></head>
-<body><div id="stage"><div id="chart"></div></div>
-<script src="${echartsScript}"></script>
-<script>
-  window.status = "pending";
-  try {
-    const chart = echarts.init(document.getElementById("chart"), ${dark ? '"dark"' : "null"}, { renderer: "canvas" });
-    chart.setOption(${JSON.stringify(themed)});
-    window.status = "done";
-  } catch (error) { window.status = "error: " + error.message; }
-</script></body></html>`;
-}
-
-async function render(page, html, name, target) {
-  const file = join(workDir, `${name}.html`);
-  writeFileSync(file, html);
-  await page.goto(pathToFileURL(file).href, { waitUntil: "load" });
-  await page.waitForFunction(() => window.status !== "pending", { timeout: 15000 });
-  const status = await page.evaluate(() => window.status);
-  if (status !== "done") throw new Error(status);
+async function settle(page) {
+  await page.waitForFunction("window.status !== 'pending'", { timeout: 15000 });
+  const status = await page.evaluate("window.status");
+  if (status !== "done") throw new Error(String(status).replace(/^error: /, ""));
   // Let fonts and the canvas settle before capture.
   await new Promise((done) => setTimeout(done, 150));
+}
+
+async function renderLocal(page, source, dark, target) {
+  const file = join(workDir, `${Date.now()}.html`);
+  writeFileSync(file, thumbnailPage(source, dark));
+  await page.setViewport({ width: WIDTH, height: HEIGHT, deviceScaleFactor: 1 });
+  await page.emulateMediaFeatures([]);
+  await page.goto(pathToFileURL(file).href, { waitUntil: "load" });
+  await settle(page);
   const stage = await page.$("#stage");
   await stage.screenshot({ path: target, omitBackground: true });
+  rmSync(file, { force: true });
+}
+
+async function renderShadcn(page, block, dark, target) {
+  await page.setViewport({ width: SHADCN_WIDTH, height: 800, deviceScaleFactor: 2 });
+  await page.emulateMediaFeatures([{ name: "prefers-color-scheme", value: dark ? "dark" : "light" }]);
+  await page.goto(`${SHADCN_VIEW}/${block}`, { waitUntil: "networkidle0", timeout: 60000 });
+  await page.waitForSelector("svg.recharts-surface", { timeout: 30000 });
+  await new Promise((done) => setTimeout(done, 500));
+  const card = await page.$("[data-slot=card]");
+  if (!card) throw new Error(`no card on the preview page for ${block}`);
+  await card.screenshot({ path: target, omitBackground: true });
+}
+
+function sourceFor(chart, provider) {
+  if (provider === "mermaid") return { kind: "mermaid", text: chart.mermaid.template };
+  if (provider === "echarts") return chart.echarts.option ? { kind: "echarts", text: JSON.stringify(chart.echarts.option) } : undefined;
+  return undefined;
 }
 
 async function main() {
-  const charts = await loadCatalogue();
   mkdirSync(outDir, { recursive: true });
   const browser = await puppeteer.launch({ executablePath: chrome, headless: true });
   const page = await browser.newPage();
-  await page.setViewport({ width: WIDTH, height: HEIGHT, deviceScaleFactor: 1 });
   const done = [];
   const failed = [];
 
   try {
-    for (const chart of charts) {
-      if (only.size > 0 && !only.has(chart.id)) continue;
-      const sample = ECHARTS_SAMPLES[chart.id];
-      if (!chart.mermaid && !sample) {
-        failed.push(`${chart.id}: no Mermaid template and no ECharts sample`);
-        continue;
-      }
-      try {
-        for (const dark of [false, true]) {
-          const html = chart.mermaid ? mermaidPage(chart.mermaid.template, dark) : echartsPage(sample, dark);
-          await render(page, html, `${chart.id}${dark ? "-dark" : ""}`, join(outDir, `${chart.id}${dark ? "@dark" : ""}.png`));
+    for (const chart of CHARTS) {
+      if (onlyIds.size > 0 && !onlyIds.has(chart.id)) continue;
+      for (const provider of PROVIDERS) {
+        if (!chart[provider]) continue;
+        if (onlyProviders.size > 0 && !onlyProviders.has(provider)) continue;
+        const key = `${chart.id}-${provider}`;
+        try {
+          for (const dark of [false, true]) {
+            const target = join(outDir, `${key}${dark ? "@dark" : ""}.png`);
+            if (provider === "shadcn") {
+              await renderShadcn(page, chart.shadcn.block, dark, target);
+            } else {
+              const source = sourceFor(chart, provider);
+              if (!source) throw new Error("no option in the catalogue");
+              await renderLocal(page, source, dark, target);
+            }
+          }
+          done.push(key);
+          console.log(`rendered ${key}`);
+        } catch (error) {
+          failed.push(`${key}: ${error.message}`);
         }
-        done.push(chart.id);
-        console.log(`rendered ${chart.id}`);
-      } catch (error) {
-        failed.push(`${chart.id}: ${error.message}`);
       }
     }
   } finally {
     await browser.close();
   }
 
-  if (only.size === 0) {
-    const known = (file) => charts.some((chart) => file === `${chart.id}.png` || file === `${chart.id}@dark.png`);
-    for (const file of readdirSync(outDir)) if (!known(file)) rmSync(join(outDir, file));
+  if (onlyIds.size === 0 && onlyProviders.size === 0) {
+    const known = new Set(CHARTS.flatMap((chart) => PROVIDERS.filter((p) => chart[p]).map((p) => `${chart.id}-${p}`)));
+    for (const file of readdirSync(outDir)) {
+      if (!known.has(file.replace(/(@dark)?\.png$/, ""))) rmSync(join(outDir, file));
+    }
   }
-  const ids = readdirSync(outDir)
+  const keys = readdirSync(outDir)
     .filter((file) => file.endsWith(".png") && !file.includes("@dark"))
     .map((file) => file.replace(/\.png$/, ""))
     .sort();
   writeFileSync(
     join(root, "src", "data", "thumbnails.ts"),
     `// Generated by scripts/render-thumbnails.mjs. Do not edit by hand.\n` +
-      `// Chart ids that have a thumbnail at assets/charts/<id>.png (and <id>@dark.png).\n` +
-      `export const THUMBNAILS: string[] = [\n${ids.map((id) => `  "${id}",\n`).join("")}];\n`,
+      `// "<id>-<provider>" keys with a thumbnail at assets/charts/<key>.png (and <key>@dark.png).\n` +
+      `export const THUMBNAILS: string[] = [\n${keys.map((key) => `  "${key}",\n`).join("")}];\n`,
   );
 
   console.log(`\n${done.length} rendered, ${failed.length} failed`);

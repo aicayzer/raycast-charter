@@ -1,10 +1,10 @@
 import { Grid } from "@raycast/api";
 import type { ViewMode } from "../hooks/useViewMode";
-import { providerLabel, searchKeywords, type ProviderFilter } from "../lib/catalogue";
+import { lensProvider, providerLabel, searchKeywords, type Lens } from "../lib/catalogue";
 import type { ChartSection } from "../lib/sections";
 import { tileContent } from "../lib/thumbnails";
 import ChartActions from "./ChartActions";
-import ProviderDropdown from "./ProviderDropdown";
+import LensDropdown from "./LensDropdown";
 
 export interface BrowseProps {
   sections: ChartSection[];
@@ -15,8 +15,8 @@ export interface BrowseProps {
   onUse: (id: string) => Promise<void>;
   /** Absent when there is nothing to clear. */
   onClearRecent?: () => Promise<void>;
-  filter: ProviderFilter;
-  onFilterChange: (filter: ProviderFilter) => void;
+  lens: Lens;
+  onLensChange: (lens: Lens) => void;
   viewMode: ViewMode;
   onViewModeChange: (mode: ViewMode) => void;
   showDetail: boolean;
@@ -33,8 +33,8 @@ export default function ChartGrid(props: BrowseProps) {
     onToggleFavourite,
     onUse,
     onClearRecent,
-    filter,
-    onFilterChange,
+    lens,
+    onLensChange,
     viewMode,
     onViewModeChange,
     showDetail,
@@ -50,36 +50,40 @@ export default function ChartGrid(props: BrowseProps) {
       aspectRatio="3/2"
       fit={Grid.Fit.Contain}
       searchBarPlaceholder="Search chart types"
-      searchBarAccessory={<ProviderDropdown value={filter} onChange={onFilterChange} />}
+      searchBarAccessory={<LensDropdown value={lens} onChange={onLensChange} />}
     >
       {sections.map((section) => (
         <Grid.Section key={section.id} title={section.title}>
-          {section.charts.map((chart) => (
-            <Grid.Item
-              key={`${section.id}-${chart.id}`}
-              content={tileContent(chart)}
-              title={chart.name}
-              subtitle={providerLabel(chart, filter)}
-              keywords={searchKeywords(chart)}
-              actions={
-                <ChartActions
-                  chart={chart}
-                  isFavourite={isFavourite(chart.id)}
-                  onToggleFavourite={onToggleFavourite}
-                  onUse={onUse}
-                  browse={{
-                    onClearRecent,
-                    viewMode,
-                    onSwitchView: () => onViewModeChange("list"),
-                    showDetail,
-                    onToggleDetail,
-                    columns,
-                    onColumnsChange,
-                  }}
-                />
-              }
-            />
-          ))}
+          {section.charts.map((chart) => {
+            const provider = lensProvider(chart, lens);
+            return (
+              <Grid.Item
+                key={`${section.id}-${chart.id}`}
+                content={tileContent(chart, provider)}
+                title={chart.name}
+                subtitle={providerLabel(chart, provider)}
+                keywords={searchKeywords(chart)}
+                actions={
+                  <ChartActions
+                    chart={chart}
+                    provider={provider}
+                    isFavourite={isFavourite(chart.id)}
+                    onToggleFavourite={onToggleFavourite}
+                    onUse={onUse}
+                    browse={{
+                      onClearRecent,
+                      viewMode,
+                      onSwitchView: () => onViewModeChange("list"),
+                      showDetail,
+                      onToggleDetail,
+                      columns,
+                      onColumnsChange,
+                    }}
+                  />
+                }
+              />
+            );
+          })}
         </Grid.Section>
       ))}
     </Grid>

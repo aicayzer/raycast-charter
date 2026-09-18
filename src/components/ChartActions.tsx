@@ -2,7 +2,17 @@ import { Action, ActionPanel, Icon, Keyboard, showToast, Toast } from "@raycast/
 import { showFailureToast } from "@raycast/utils";
 import { PROVIDERS } from "../data/providers";
 import { MAX_COLUMNS, MIN_COLUMNS, type ViewMode } from "../hooks/useViewMode";
-import { docsUrl, fencedTemplate, promptSnippet, shadcnAddCommand, type ChartType } from "../lib/catalogue";
+import {
+  docsUrl,
+  fencedTemplate,
+  promptSnippet,
+  PROVIDER_ORDER,
+  rawTemplate,
+  shadcnAddCommand,
+  shadcnPreviewUrl,
+  type ChartType,
+  type Provider,
+} from "../lib/catalogue";
 import ChartDetail from "./ChartDetail";
 import RenderView from "./RenderView";
 
@@ -10,8 +20,13 @@ function shortcut(key: Keyboard.KeyEquivalent, ...extra: Keyboard.KeyModifier[])
   return { modifiers: ["cmd", ...extra], key };
 }
 
+/** What the other providers' copies are called: the example is syntax, an option or a component. */
+const TEMPLATE_NOUN: Record<Provider, string> = { mermaid: "Template", echarts: "Option", shadcn: "Component" };
+
 export interface ChartActionsProps {
   chart: ChartType;
+  /** The provider whose content the view shows and the primary actions follow. */
+  provider: Provider;
   isFavourite: boolean;
   onToggleFavourite: (id: string) => Promise<boolean>;
   /** Called when the type is opened or copied from, so it joins the Recent section. */
@@ -28,12 +43,16 @@ export interface ChartActionsProps {
   };
 }
 
-export default function ChartActions({ chart, isFavourite, onToggleFavourite, onUse, browse }: ChartActionsProps) {
-  const docs = docsUrl(chart);
+export default function ChartActions(props: ChartActionsProps) {
+  const { chart, provider, isFavourite, onToggleFavourite, onUse, browse } = props;
+  const docs = docsUrl(chart, provider);
+  const fenced = fencedTemplate(chart, provider);
+  const raw = rawTemplate(chart, provider);
   const addCommand = shadcnAddCommand(chart);
-  const fenced = fencedTemplate(chart);
+  const preview = shadcnPreviewUrl(chart);
   // With the list panel open the page would repeat what is already on screen, so Enter goes to the docs.
   const docsFirst = !browse || (browse.viewMode === "list" && browse.showDetail);
+  const others = PROVIDER_ORDER.filter((other) => other !== provider && rawTemplate(chart, other));
 
   // Recording a use is bookkeeping; a storage failure must not stop the copy or open it follows.
   function used() {
@@ -61,10 +80,12 @@ export default function ChartActions({ chart, isFavourite, onToggleFavourite, on
     }
   }
 
+  const openDocs = docs && <Action.OpenInBrowser title="Open Docs" url={docs} onOpen={used} />;
+
   return (
     <ActionPanel title={chart.name}>
       <ActionPanel.Section>
-        {docsFirst && docs && <Action.OpenInBrowser title="Open Docs" url={docs} onOpen={used} />}
+        {docsFirst && openDocs}
         {browse && (
           <Action.Push
             title="Show Chart"
@@ -72,6 +93,7 @@ export default function ChartActions({ chart, isFavourite, onToggleFavourite, on
             target={
               <ChartDetail
                 chart={chart}
+                provider={provider}
                 isFavourite={isFavourite}
                 onToggleFavourite={onToggleFavourite}
                 onUse={onUse}
@@ -80,14 +102,23 @@ export default function ChartActions({ chart, isFavourite, onToggleFavourite, on
             onPush={used}
           />
         )}
-        {!docsFirst && docs && <Action.OpenInBrowser title="Open Docs" url={docs} onOpen={used} />}
-        {chart.mermaid && (
+        {!docsFirst && openDocs}
+        {provider !== "shadcn" && raw && (
           <Action.Push
             title="Render Template"
             icon={Icon.Image}
             shortcut={shortcut("r", "shift")}
-            target={<RenderView source={{ kind: "mermaid", text: chart.mermaid.template }} title={chart.name} />}
+            target={<RenderView source={{ kind: provider, text: raw }} title={chart.name} />}
             onPush={used}
+          />
+        )}
+        {provider === "shadcn" && preview && (
+          <Action.OpenInBrowser
+            title="Open Preview"
+            icon={Icon.Image}
+            shortcut={shortcut("r", "shift")}
+            url={preview}
+            onOpen={used}
           />
         )}
       </ActionPanel.Section>
@@ -109,17 +140,17 @@ export default function ChartActions({ chart, isFavourite, onToggleFavourite, on
             onCopy={used}
           />
         )}
-        {chart.mermaid && (
+        {raw && (
           <Action.CopyToClipboard
             title="Copy Raw Template"
-            content={chart.mermaid.template}
+            content={raw}
             shortcut={shortcut("t", "opt")}
             onCopy={used}
           />
         )}
         <Action.CopyToClipboard
           title="Copy Prompt Snippet"
-          content={promptSnippet(chart)}
+          content={promptSnippet(chart, provider)}
           shortcut={shortcut("p", "shift")}
           onCopy={used}
         />
@@ -133,7 +164,7 @@ export default function ChartActions({ chart, isFavourite, onToggleFavourite, on
         )}
       </ActionPanel.Section>
 
-      <ActionPanel.Section title="Providers">
+      <ActionPanel.Section title="Libraries">
         {chart.mermaid && (
           <Action.OpenInBrowser title={`Open ${PROVIDERS.mermaid.title} Docs`} url={chart.mermaid.docs} onOpen={used} />
         )}
@@ -147,6 +178,14 @@ export default function ChartActions({ chart, isFavourite, onToggleFavourite, on
         {chart.echarts && (
           <Action.OpenInBrowser title={`Open ${PROVIDERS.echarts.title} Docs`} url={chart.echarts.docs} onOpen={used} />
         )}
+        {others.map((other) => (
+          <Action.CopyToClipboard
+            key={other}
+            title={`Copy ${PROVIDERS[other].title} ${TEMPLATE_NOUN[other]}`}
+            content={fencedTemplate(chart, other) ?? ""}
+            onCopy={used}
+          />
+        ))}
       </ActionPanel.Section>
 
       <ActionPanel.Section title="Catalogue">

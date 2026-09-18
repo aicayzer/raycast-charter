@@ -1,6 +1,11 @@
+import { SHADCN_VIEW } from "../data/urls";
+
 export type Provider = "mermaid" | "shadcn" | "echarts";
 
-export type Family = "flow" | "structure" | "hierarchy" | "quantity" | "time" | "framework";
+/** The search-bar dropdown: every type with Mermaid first, or one library's view of the catalogue. */
+export type Lens = "all" | Provider;
+
+export type Family = "flow" | "structure" | "hierarchy" | "quantity" | "time" | "geo" | "framework";
 
 export interface MermaidSupport {
   /** The first line of the diagram, e.g. `radar-beta`. */
@@ -20,11 +25,17 @@ export interface ShadcnSupport {
   docs: string;
 }
 
+/** A plain ECharts option: JSON-serializable, so no functions. */
+export type EchartsOption = Record<string, unknown>;
+
 export interface EchartsSupport {
   /** Series type in the ECharts option, e.g. `radar`. */
   series: string;
   docs: string;
-  note?: string;
+  /** A complete, small option that draws the type. */
+  option?: EchartsOption;
+  /** Extra guidance for a model writing this option. */
+  hint?: string;
 }
 
 export interface ChartType {
@@ -40,20 +51,21 @@ export interface ChartType {
   notes?: string;
 }
 
-/** The search-bar dropdown: every type, or only those one provider can draw. */
-export type ProviderFilter = "all" | Provider;
-
 export const PROVIDER_ORDER: Provider[] = ["mermaid", "shadcn", "echarts"];
 
-export function matchesFilter(chart: ChartType, filter: ProviderFilter): boolean {
-  return filter === "all" || Boolean(chart[filter]);
+export function matchesLens(chart: ChartType, lens: Lens): boolean {
+  return lens === "all" || Boolean(chart[lens]);
 }
 
-/** What the tile says under the name: the keyword for the chosen provider, else the first provider. */
-export function providerLabel(chart: ChartType, filter: ProviderFilter): string | undefined {
-  if (filter === "shadcn") return chart.shadcn?.block;
-  if (filter === "echarts") return chart.echarts?.series;
-  return mermaidTag(chart) ?? (chart.shadcn ? "shadcn" : chart.echarts ? "ECharts" : undefined);
+/** The provider whose content a view shows: the lens when the type has it, else the first present. */
+export function lensProvider(chart: ChartType, lens: Lens): Provider {
+  if (lens !== "all" && chart[lens]) return lens;
+  return PROVIDER_ORDER.find((provider) => Boolean(chart[provider])) ?? "mermaid";
+}
+
+/** Providers that cannot draw the chart, in display order. */
+export function missingProviders(chart: ChartType): Provider[] {
+  return PROVIDER_ORDER.filter((provider) => !chart[provider]);
 }
 
 export function groupByFamily(charts: ChartType[]): Map<Family, ChartType[]> {
@@ -66,9 +78,8 @@ export function groupByFamily(charts: ChartType[]): Map<Family, ChartType[]> {
   return groups;
 }
 
-/** The docs link Enter opens: Mermaid first, then whichever provider the type has. */
-export function docsUrl(chart: ChartType): string | undefined {
-  return chart.mermaid?.docs ?? chart.shadcn?.docs ?? chart.echarts?.docs;
+export function docsUrl(chart: ChartType, provider: Provider): string | undefined {
+  return chart[provider]?.docs;
 }
 
 /** "Mermaid 11.6+" for types with a known first release, "Mermaid" for long-standing ones. */
@@ -83,45 +94,65 @@ export function mermaidLabel(chart: ChartType): string | undefined {
   return chart.mermaid.since ? `${chart.mermaid.keyword}, ${chart.mermaid.since}+` : chart.mermaid.keyword;
 }
 
-/** Providers that cannot draw the chart, in display order. */
-export function missingProviders(chart: ChartType): Provider[] {
-  return PROVIDER_ORDER.filter((provider) => !chart[provider]);
-}
-
-/** The Mermaid template inside a fence, ready to paste into a chat or a Markdown note. */
-export function fencedTemplate(chart: ChartType): string | undefined {
-  return chart.mermaid ? "```mermaid\n" + chart.mermaid.template + "\n```" : undefined;
+/** What the tile says under the name for one provider: the Mermaid tag, the block, or the series. */
+export function providerLabel(chart: ChartType, provider: Provider): string | undefined {
+  if (provider === "shadcn") return chart.shadcn?.block;
+  if (provider === "echarts") return chart.echarts?.series;
+  return mermaidTag(chart);
 }
 
 export function shadcnAddCommand(chart: ChartType): string | undefined {
   return chart.shadcn ? `npx shadcn@latest add ${chart.shadcn.block}` : undefined;
 }
 
-/** What to paste into a model conversation so it answers with this chart. */
-export function promptSnippet(chart: ChartType): string {
-  if (chart.mermaid) {
+export function shadcnPreviewUrl(chart: ChartType): string | undefined {
+  return chart.shadcn ? `${SHADCN_VIEW}/${chart.shadcn.block}` : undefined;
+}
+
+/** The provider's example as text: Mermaid syntax, the ECharts option as JSON, or the shadcn component. */
+export function rawTemplate(chart: ChartType, provider: Provider): string | undefined {
+  if (provider === "mermaid") return chart.mermaid?.template;
+  if (provider === "echarts") return chart.echarts?.option ? JSON.stringify(chart.echarts.option, null, 2) : undefined;
+  return undefined;
+}
+
+const FENCE_LANGUAGE: Record<Provider, string> = { mermaid: "mermaid", echarts: "json", shadcn: "tsx" };
+
+/** The template inside a fence, ready to paste into a chat or a Markdown note. */
+export function fencedTemplate(chart: ChartType, provider: Provider): string | undefined {
+  const raw = rawTemplate(chart, provider);
+  return raw === undefined ? undefined : "```" + FENCE_LANGUAGE[provider] + "\n" + raw + "\n```";
+}
+
+/** What to paste into a model conversation so it answers with this chart, drawn by this provider. */
+export function promptSnippet(chart: ChartType, provider: Provider): string {
+  const name = chart.name.toLowerCase();
+  if (provider === "mermaid" && chart.mermaid) {
     const lines = [
-      `Return the answer as a Mermaid ${chart.name.toLowerCase()} chart (\`${chart.mermaid.keyword}\`) inside a \`\`\`mermaid fence.`,
+      `Return the answer as a Mermaid ${name} chart (\`${chart.mermaid.keyword}\`) inside a \`\`\`mermaid fence.`,
     ];
-    if (chart.mermaid.since) {
-      lines.push(`This type needs Mermaid ${chart.mermaid.since} or later.`);
-    }
+    if (chart.mermaid.since) lines.push(`This type needs Mermaid ${chart.mermaid.since} or later.`);
     if (chart.mermaid.hint) lines.push(chart.mermaid.hint);
     lines.push("Follow this syntax exactly:", "", chart.mermaid.template);
     return lines.join("\n");
   }
-  if (chart.echarts) {
+  if (provider === "echarts" && chart.echarts) {
     const lines = [
       `Return the answer as an Apache ECharts option (JSON) using a \`${chart.echarts.series}\` series, inside a \`\`\`json fence.`,
+      "Keep the option self-contained: data inline, short labels, no functions.",
     ];
-    if (chart.echarts.note) lines.push(chart.echarts.note);
-    lines.push("Keep the option self-contained: data inline, short labels, no functions.");
+    if (chart.echarts.hint) lines.push(chart.echarts.hint);
+    const raw = rawTemplate(chart, "echarts");
+    if (raw) lines.push("Shape it like this:", "", raw);
     return lines.join("\n");
   }
-  if (chart.shadcn) {
-    return `Return the answer as a shadcn/ui chart using the \`${chart.shadcn.block}\` block (Recharts), as a React component with the data inline.`;
+  if (provider === "shadcn" && chart.shadcn) {
+    return [
+      `Return the answer as a shadcn/ui chart using the \`${chart.shadcn.block}\` block (Recharts), as a React component with the data inline.`,
+      `Install it with \`${shadcnAddCommand(chart)}\`.`,
+    ].join("\n");
   }
-  return `Return the answer as a ${chart.name.toLowerCase()} chart.`;
+  return `Return the answer as a ${name} chart.`;
 }
 
 /** Search keywords Raycast matches alongside the title. */
