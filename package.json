@@ -2,7 +2,7 @@
   "$schema": "https://www.raycast.com/schemas/extension.json",
   "name": "charter",
   "title": "Charter",
-  "description": "A catalog of chart and diagram types showing which of Mermaid, shadcn or ECharts can draw each one, with docs links, templates and prompt snippets a keystroke away, and a renderer that draws Mermaid or ECharts on your machine",
+  "description": "A catalog of chart and diagram types showing what Mermaid, shadcn and ECharts can draw, with each library's example, docs and prompt snippet a keystroke away, and a renderer that draws Mermaid and ECharts on your machine",
   "icon": "charter.png",
   "author": "aic",
   "platforms": [
@@ -18,7 +18,7 @@
       "name": "browse-charts",
       "title": "Browse Charts",
       "subtitle": "Charter",
-      "description": "Browse chart and diagram types by family, see which provider draws each one, and copy the docs link, template or prompt snippet",
+      "description": "Browse chart and diagram types by family through a Mermaid, shadcn or ECharts lens, and copy the docs link, example or prompt snippet",
       "mode": "view"
     },
     {
